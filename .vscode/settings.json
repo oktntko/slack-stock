@@ -1,0 +1,43 @@
+{
+  "[html]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[css]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[markdown]": {
+    "files.trimTrailingWhitespace": false
+  },
+  "[vue]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "javascript.format.enable": false,
+  "typescript.format.enable": false,
+  "files.encoding": "utf8",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "prettier.semi": true,
+  "prettier.singleQuote": false,
+  "prettier.endOfLine": "lf",
+  "files.eol": "\n",
+  "editor.formatOnSave": true
+}

@@ -1,7 +1,4 @@
-slack-stock
-===========
-
-
+# slack-stock
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/slack-stock.svg)](https://npmjs.org/package/slack-stock)
@@ -9,11 +6,15 @@ slack-stock
 [![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/cli/slack-stock/blob/master/package.json)
 
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g slack-stock
 $ slst COMMAND
@@ -25,11 +26,15 @@ USAGE
   $ slst COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`slst hello [FILE]`](#slst-hello-file)
-* [`slst help [COMMAND]`](#slst-help-command)
+
+- [`slst hello [FILE]`](#slst-hello-file)
+- [`slst help [COMMAND]`](#slst-help-command)
 
 ## `slst hello [FILE]`
 
@@ -67,4 +72,44 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
+
 <!-- commandsstop -->
+
+# Slack App
+
+- Create an App
+- From scratch
+- Create an App
+- OAuth & Permissions
+- Scopes
+- User Token Scopes
+  - channels:read
+  - channels:history
+  - users:read
+  - users.profile:read
+- OAuth Tokens for Your Workspace
+  - Install to Workspace
+- OAuth Tokens for Your Workspace
+- Copy User OAuth Token
+
+# Slack Api
+
+## チャンネルリスト
+
+conversations.list
+https://api.slack.com/methods/conversations.list
+
+## 会話ログ
+
+conversations.history
+https://api.slack.com/methods/conversations.history
+
+## ユーザリスト
+
+users.list
+https://api.slack.com/methods/users.list
+
+## プロフィール
+
+users.profile.get
+https://api.slack.com/methods/users.profile.get
