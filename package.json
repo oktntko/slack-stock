@@ -23,6 +23,7 @@
     "mocha": "^5.2.0",
     "nexe": "^4.0.0-beta.19",
     "nyc": "^14.1.1",
+    "prisma": "^3.2.1",
     "ts-node": "^8.10.2",
     "tsconfig-paths": "^3.11.0",
     "typescript": "^3.9.10"
@@ -57,18 +58,24 @@
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md",
     "nexe": "nexe bin/run",
-    "start": "./bin/run"
+    "start": "./bin/run",
+    "migrate": "prisma migrate dev",
+    "seed": "prisma db seed"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
     "@oclif/command": "^1.8.0",
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.3",
+    "@prisma/client": "^3.2.1",
     "@slack/web-api": "^6.4.0",
     "cli-ux": "^5.6.3",
     "inquirer": "^8.2.0",
     "inquirer-autocomplete-prompt": "^1.4.0",
     "js-yaml": "^4.1.0",
     "tslib": "^1.14.1"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
   }
 }
