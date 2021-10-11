@@ -1,5 +1,16 @@
 #!/usr/bin/env node
+const tsconfigPaths = require("tsconfig-paths");
+const fs = require("fs");
+const Hjson = require("hjson");
 
-require('@oclif/command').run()
-.then(require('@oclif/command/flush'))
-.catch(require('@oclif/errors/handle'))
+const tsconfig = Hjson.parse(fs.readFileSync("tsconfig.json", "utf8"));
+
+tsconfigPaths.register({
+  baseUrl: "./",
+  paths: tsconfig.compilerOptions.paths,
+});
+
+require("@oclif/command")
+  .run()
+  .then(require("@oclif/command/flush"))
+  .catch(require("@oclif/errors/handle"));

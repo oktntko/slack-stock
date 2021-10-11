@@ -1,4 +1,7 @@
+import { isExistsConfigFile } from "@/config";
+import { editConfig, selectMenu } from "@/interactive";
 import { Command, flags } from "@oclif/command";
+import { cli } from "cli-ux";
 
 export default class Hello extends Command {
   static description = "describe the command here";
@@ -20,8 +23,12 @@ hello world from ./src/hello.ts!
   static args = [{ name: "file" }];
 
   async run() {
-    // 案内
-    // コンフィグファイルがない場合、チュートリアル
-    // コンフィグファイルがある場合、メニュー
+    if (isExistsConfigFile()) {
+      // コンフィグファイルがある場合、メニュー
+      selectMenu();
+    } else {
+      // コンフィグファイルがない場合、チュートリアル
+      editConfig();
+    }
   }
 }

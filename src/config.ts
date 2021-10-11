@@ -10,7 +10,7 @@ export const isExistsConfigFile = (): boolean => {
 };
 
 export const createDefaultConfigFile = () => {
-  const config_file_default: Config = {
+  const defaultConfig: Config = {
     default: "my-slack",
     slack_config: {
       "my-slack": {
@@ -19,18 +19,31 @@ export const createDefaultConfigFile = () => {
     },
   };
 
-  yaml.dump(config_file_default);
+  saveConfig(defaultConfig);
 };
 
-export const loadConfig = (slack_name: string): Config => {
+export const loadConfig = (): Config => {
   try {
-    const doc = yaml.load(fs.readFileSync(SLSTRC, "utf8"));
-    if (!isConfig(doc)) throw new Error();
-    return doc;
+    const config = yaml.load(fs.readFileSync(SLSTRC, "utf8"));
+
+    if (isConfig(config)) return config;
+
+    throw new Error();
   } catch (e) {
     console.log(e);
     throw e;
   }
+};
+
+export const loadSlackConfig = (slack_name?: string): SlackConfig => {
+  const config = loadConfig();
+
+  return config.slack_config[slack_name ? slack_name : config.default];
+};
+
+export const saveConfig = (config: Config): void => {
+  const yamlText = yaml.dump(config);
+  fs.writeFileSync(SLSTRC, yamlText, "utf8");
 };
 
 const isConfig = (unkownConfig: unknown): unkownConfig is Config => {
