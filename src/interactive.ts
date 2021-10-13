@@ -1,10 +1,20 @@
-import inquirer from "inquirer";
 import {
   createDefaultConfigFile,
   isExistsConfigFile,
   loadConfig,
+  loadSlackConfig,
   saveConfig,
 } from "@/config";
+import ORM from "@/wrapper/ORM";
+import {
+  conversationsHistory,
+  conversationsList,
+  convertToConversation,
+  convertToMessage,
+  convertToUser,
+  usersList,
+} from "@/wrapper/slack-api";
+import inquirer from "inquirer";
 
 export const selectMenu = async () => {
   const { want } = await inquirer.prompt([
@@ -19,7 +29,7 @@ export const selectMenu = async () => {
         },
         {
           name: "📥Export data",
-          value: "📥Export data",
+          value: "Export data",
         },
         new inquirer.Separator("Other"),
         {
@@ -41,6 +51,130 @@ export const selectMenu = async () => {
       ],
     },
   ]);
+
+  if (want == "Fetch data") {
+    fetchData();
+  }
+};
+
+export const fetchData = async (
+  type?: "user" | "channel" | "message",
+  slackName?: string,
+  _channel_id?: string
+) => {
+  if (!type) {
+    const { data } = await inquirer.prompt([
+      {
+        type: "list",
+        name: "data",
+        message: "What data do you want to fetch?",
+        choices: [
+          {
+            name: "💬Fetch message data",
+            value: "message",
+          },
+          {
+            name: "👤Fetch user data",
+            value: "user",
+          },
+          {
+            name: "📺Fetch channel data",
+            value: "channel",
+          },
+        ],
+      },
+    ]);
+    type = data;
+  }
+
+  if (type == "user") {
+    fetchUsers(slackName);
+  } else if (type == "channel") {
+    fetchConversations(slackName);
+  } else {
+    if (!_channel_id) {
+      const { channel_id } = await inquirer.prompt([
+        {
+          type: "list",
+          name: "channel_id",
+          message: "What data do you want to fetch?",
+          choices: (
+            await ORM.conversation.findMany()
+          ).map((channel) => ({
+            name: channel.name,
+            value: channel.conversation_id,
+          })),
+        },
+      ]);
+      _channel_id = channel_id;
+    }
+    fetchMessages(_channel_id!, slackName);
+  }
+};
+
+export const fetchConversations = async (slackName?: string) => {
+  const config = loadSlackConfig(slackName);
+
+  const conversationsListResponse = await conversationsList(config.token);
+  if (!conversationsListResponse.ok || !conversationsListResponse.channels) {
+    throw new Error();
+  }
+
+  const { channels } = conversationsListResponse;
+
+  for (const channel of channels) {
+    const conversation = convertToConversation(channel);
+    await ORM.conversation.upsert({
+      where: { conversation_id: conversation.conversation_id },
+      create: conversation,
+      update: conversation,
+    });
+  }
+};
+
+export const fetchUsers = async (slackName?: string) => {
+  const config = loadSlackConfig(slackName);
+
+  const usersListResponse = await usersList(config.token);
+  if (!usersListResponse.ok || !usersListResponse.members) {
+    throw new Error();
+  }
+
+  const { members } = usersListResponse;
+
+  for (const member of members) {
+    const user = convertToUser(member);
+    await ORM.user.upsert({
+      where: { user_id: user.user_id },
+      create: user,
+      update: user,
+    });
+  }
+};
+
+export const fetchMessages = async (channel_id: string, slackName?: string) => {
+  const config = loadSlackConfig(slackName);
+
+  const conversationsHistoryResponse = await conversationsHistory(
+    config.token,
+    channel_id
+  );
+  if (
+    !conversationsHistoryResponse.ok ||
+    !conversationsHistoryResponse.messages
+  ) {
+    throw new Error();
+  }
+
+  const { messages } = conversationsHistoryResponse;
+
+  for (const _ of messages) {
+    console.log(_);
+    const message = convertToMessage(channel_id, _);
+    await ORM.message.create({
+      data: message,
+    });
+  }
 };
 
 export const editConfig = async () => {

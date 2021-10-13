@@ -1,7 +1,6 @@
 import { isExistsConfigFile } from "@/config";
 import { editConfig, selectMenu } from "@/interactive";
 import { Command, flags } from "@oclif/command";
-import { cli } from "cli-ux";
 
 export default class Hello extends Command {
   static description = "describe the command here";

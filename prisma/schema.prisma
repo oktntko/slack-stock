@@ -10,34 +10,55 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-
-  @@map("posts")
-}
-
-model Profile {
-  id     Int     @id @default(autoincrement())
-  bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
-
-  @@map("profiles")
-}
-
+// https://api.slack.com/types/user
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  name    String?
-  posts   Post[]
-  profile Profile?
+  user_id             String  @id
+  team_id             String // ワークスペースの ID
+  real_name           String // The real name that the user specified in their workspace profile.
+  is_admin            Boolean // Indicates whether the user is an Admin of the current workspace.
+  is_owner            Boolean // Indicates whether the user is an Owner of the current workspace.
+  is_primary_owner    Boolean // Indicates whether the user is the Primary Owner of the current workspace.
+  is_restricted       Boolean // Indicates whether or not the user is a guest user. Use in combination with the is_ultra_restricted field to check if the user is a single-channel guest user.
+  is_ultra_restricted Boolean // Indicates whether or not the user is a single-channel guest.
+  is_app_user         Boolean // Indicates whether the user is an authorized user of the calling app.
+  is_bot              Boolean // Indicates whether the user is actually a bot user. Bleep bloop. Note that Slackbot is special so is_bot will be false for it.
+  deleted             Boolean // This user has been deactivated when the value of this field is true. Otherwise the value is false or the field may not appear at all.
 
+  Messages Message[]
   @@map("users")
+}
+
+// https://api.slack.com/types/conversation
+model Conversation {
+  conversation_id       String  @id
+  name                  String
+  is_channel            Boolean
+  is_group              Boolean
+  is_im                 Boolean
+  is_mpim               Boolean
+  is_private            Boolean
+  is_archived           Boolean
+  is_general            Boolean
+  is_shared             Boolean
+  is_org_shared         Boolean
+  is_pending_ext_shared Boolean
+  is_ext_shared         Boolean
+
+  Messages Message[]
+  @@map("conversations")
+}
+
+// https://api.slack.com/types/conversation
+model Message {
+  message_id      Int      @id @default(autoincrement())
+  conversation_id String
+  type            String
+  user_id         String
+  team_id         String?
+  text            String
+  ts              DateTime
+
+  conversation Conversation @relation(fields: [conversation_id], references: [conversation_id])
+  user         User?        @relation(fields: [user_id], references: [user_id])
+  @@map("messages")
 }
