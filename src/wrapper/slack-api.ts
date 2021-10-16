@@ -1,8 +1,4 @@
-import { Conversation, User, Prisma } from "@prisma/client";
-import { WebClient, LogLevel } from "@slack/web-api";
-import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
-import { Channel } from "@slack/web-api/dist/response/ConversationsListResponse";
-import { Member } from "@slack/web-api/dist/response/UsersListResponse";
+import { LogLevel, WebClient } from "@slack/web-api";
 
 const client = new WebClient(undefined, {
   logLevel: LogLevel.DEBUG,
@@ -25,22 +21,6 @@ export const conversationsList = (
     types,
   });
 
-export const convertToConversation = (channel: Channel): Conversation => ({
-  conversation_id: channel.id!,
-  name: channel.name!,
-  is_channel: channel.is_channel!,
-  is_group: channel.is_group!,
-  is_im: channel.is_im!,
-  is_mpim: channel.is_mpim!,
-  is_private: channel.is_private!,
-  is_archived: channel.is_archived!,
-  is_general: channel.is_general!,
-  is_shared: channel.is_shared!,
-  is_org_shared: channel.is_org_shared!,
-  is_pending_ext_shared: channel.is_pending_ext_shared!,
-  is_ext_shared: channel.is_ext_shared!,
-});
-
 export const conversationsHistory = (
   token: string,
   channel: string,
@@ -60,18 +40,6 @@ export const conversationsHistory = (
     oldest,
   });
 
-export const convertToMessage = (
-  conversation_id: string,
-  message: Message
-): Prisma.MessageUncheckedCreateInput => ({
-  conversation_id: conversation_id,
-  type: message.type!,
-  user_id: message.user!,
-  team_id: message.team,
-  text: message.text!,
-  ts: new Date(Number(message.ts!) * 100),
-});
-
 export const usersList = (
   token: string,
   team_id?: string,
@@ -86,17 +54,3 @@ export const usersList = (
     limit,
     team_id,
   });
-
-export const convertToUser = (member: Member): User => ({
-  user_id: member.id!,
-  team_id: member.team_id!,
-  real_name: member.real_name!,
-  is_admin: member.is_admin!,
-  is_owner: member.is_owner!,
-  is_primary_owner: member.is_primary_owner!,
-  is_restricted: member.is_restricted!,
-  is_ultra_restricted: member.is_ultra_restricted!,
-  is_app_user: member.is_app_user!,
-  is_bot: member.is_bot!,
-  deleted: member.deleted!,
-});

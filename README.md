@@ -6,55 +6,50 @@
 [![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/cli/slack-stock/blob/master/package.json)
 
 <!-- toc -->
-
-- [Usage](#usage)
-- [Commands](#commands)
+* [slack-stock](#slack-stock)
+* [Usage](#usage)
+* [Commands](#commands)
+* [Slack App](#slack-app)
+* [Slack Api](#slack-api)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g slack-stock
 $ slst COMMAND
 running command...
 $ slst (-v|--version|version)
-slack-stock/0.0.0 linux-x64 node-v16.8.0
+slack-stock/0.0.0 linux-x64 node-v14.15.3
 $ slst --help [COMMAND]
 USAGE
   $ slst COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
+* [`slst fetch [FILE]`](#slst-fetch-file)
+* [`slst help [COMMAND]`](#slst-help-command)
 
-- [`slst hello [FILE]`](#slst-hello-file)
-- [`slst help [COMMAND]`](#slst-help-command)
-
-## `slst hello [FILE]`
+## `slst fetch [FILE]`
 
 describe the command here
 
 ```
 USAGE
-  $ slst hello [FILE]
+  $ slst fetch [FILE]
 
 OPTIONS
   -f, --force
   -h, --help       show CLI help
   -n, --name=name  name to print
-
-EXAMPLE
-  $ slst hello
-  hello world from ./src/hello.ts!
 ```
 
-_See code: [src/commands/hello.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/hello.ts)_
+_See code: [src/commands/fetch.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/fetch.ts)_
 
 ## `slst help [COMMAND]`
 
@@ -72,7 +67,6 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
-
 <!-- commandsstop -->
 
 # Slack App

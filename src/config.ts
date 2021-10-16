@@ -35,10 +35,10 @@ export const loadConfig = (): Config => {
   }
 };
 
-export const loadSlackConfig = (slack_name?: string): SlackConfig => {
+export const loadSlackConfig = (name?: string): SlackConfig => {
   const config = loadConfig();
 
-  return config.slack_config[slack_name ? slack_name : config.default];
+  return config.slack_config[name ? name : config.default];
 };
 
 export const saveConfig = (config: Config): void => {

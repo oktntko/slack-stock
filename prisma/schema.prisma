@@ -29,8 +29,8 @@ model User {
 }
 
 // https://api.slack.com/types/conversation
-model Conversation {
-  conversation_id       String  @id
+model Channel {
+  channel_id            String  @id
   name                  String
   is_channel            Boolean
   is_group              Boolean
@@ -45,20 +45,20 @@ model Conversation {
   is_ext_shared         Boolean
 
   Messages Message[]
-  @@map("conversations")
+  @@map("channels")
 }
 
 // https://api.slack.com/types/conversation
 model Message {
-  message_id      Int      @id @default(autoincrement())
-  conversation_id String
-  type            String
-  user_id         String
-  team_id         String?
-  text            String
-  ts              DateTime
+  message_id Int    @id @default(autoincrement())
+  channel_id String
+  user_id    String
+  ts         String
+  type       String
+  text       String
 
-  conversation Conversation @relation(fields: [conversation_id], references: [conversation_id])
-  user         User?        @relation(fields: [user_id], references: [user_id])
+  channel Channel @relation(fields: [channel_id], references: [channel_id])
+  user    User?   @relation(fields: [user_id], references: [user_id])
+  @@unique([channel_id, user_id, ts, type], name: "unique_message")
   @@map("messages")
 }

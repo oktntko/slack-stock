@@ -1,5 +1,6 @@
 import { isExistsConfigFile } from "@/config";
 import { editConfig, selectMenu } from "@/interactive";
+import ORM from "@/wrapper/ORM";
 import { Command, flags } from "@oclif/command";
 
 export default class Hello extends Command {
