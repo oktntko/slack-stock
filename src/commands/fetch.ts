@@ -4,7 +4,7 @@ import {
   convertMessageFromSlackToStock,
   convertUserFromSlackToStock,
 } from "@/converter";
-import { selectChannel, selectFetchData } from "@/interactive";
+import { selectChannel, selectDate, selectFetchData } from "@/interactive";
 import ORM from "@/wrapper/ORM";
 import {
   conversationsHistory,
@@ -25,7 +25,15 @@ export default class Fetch extends Command {
     }),
     channel: flags.string({
       char: "c",
-      description: "if fetch message data, set channel id",
+      description: "if fetch message data, set channel name or channel id",
+    }),
+    from: flags.string({
+      char: "f",
+      description: "if fetch message data, set from date, format=yyyy-MM-dd",
+    }),
+    to: flags.string({
+      char: "t",
+      description: "if fetch message data, set to date, format=yyyy-MM-dd",
     }),
   };
 
@@ -42,14 +50,16 @@ export default class Fetch extends Command {
   async run() {
     const { args, flags } = this.parse(Fetch);
 
-    await fetch(args.data, flags.name, flags.channel);
+    await fetch(args.data, flags.name, flags.channel, flags.from, flags.to);
   }
 }
 
 const fetch = async (
   data?: FetchSelection,
   name?: string,
-  channel?: string
+  channel?: string,
+  from?: string,
+  to?: string
 ) => {
   const selection = await selectFetchData(data);
 
@@ -58,7 +68,11 @@ const fetch = async (
   switch (selection) {
     case "message":
       const channel_id = await selectChannel(channel);
-      await fetchMessages(config.token, channel_id);
+      const oldest = await selectDate("please input oldest date", from);
+      const latest = await selectDate("please input latest date", to);
+      latest.setDate(latest.getDate() + 1);
+
+      await fetchMessages(config.token, channel_id, oldest, latest);
       return;
     case "user":
       await fetchUsers(config.token);
@@ -69,8 +83,18 @@ const fetch = async (
   }
 };
 
-const fetchMessages = async (token: string, channel_id: string) => {
-  const { ok, messages } = await conversationsHistory(token, channel_id);
+const fetchMessages = async (
+  token: string,
+  channel_id: string,
+  oldest: Date,
+  latest: Date
+) => {
+  const { ok, messages } = await conversationsHistory(
+    token,
+    channel_id,
+    oldest,
+    latest
+  );
   if (!ok || !messages) {
     throw new Error();
   }

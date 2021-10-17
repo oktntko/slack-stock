@@ -4,8 +4,8 @@ import {
   loadConfig,
   saveConfig,
 } from "@/config";
+import inquirer from "@/wrapper/inquirer";
 import ORM from "@/wrapper/ORM";
-import inquirer from "inquirer";
 
 export const selectMenu = async () => {
   const { want } = await inquirer.prompt([
@@ -108,6 +108,40 @@ export const selectChannel = async (channelInput?: string): Promise<string> => {
   ]);
 
   return channel_id;
+};
+
+export const selectDate = async (
+  message: string,
+  dateInput?: string
+): Promise<Date> => {
+  if (dateInput) {
+    const date = new Date(dateInput);
+    if (!Number.isNaN(date.getTime())) {
+      return new Date(date.setHours(0, 0, 0, 0));
+    } else {
+      console.log("you input invalid date, please input next");
+    }
+  }
+
+  const { selection } = await inquirer.prompt([
+    {
+      type: "date",
+      name: "selection",
+      message: message,
+      filter: (d: Date) => new Date(d.setHours(0, 0, 0, 0)),
+      format: {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        weekday: "narrow",
+        timeZoneName: "short",
+        hour: undefined,
+        minute: undefined,
+      },
+    },
+  ]);
+
+  return selection;
 };
 
 export const editConfig = async () => {

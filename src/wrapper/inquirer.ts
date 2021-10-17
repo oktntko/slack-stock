@@ -1,6 +1,10 @@
 import inquirer from "inquirer";
-import autocomplete from "inquirer-autocomplete-prompt";
 
-inquirer.registerPrompt("autocomplete", autocomplete);
+inquirer.registerPrompt(
+  "autocomplete",
+  require("inquirer-autocomplete-prompt")
+);
+//intl-date-time-format-checker.pages.dev/
+https: inquirer.registerPrompt("date", require("inquirer-date-prompt"));
 
 export default inquirer;

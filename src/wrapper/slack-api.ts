@@ -24,8 +24,8 @@ export const conversationsList = (
 export const conversationsHistory = (
   token: string,
   channel: string,
-  oldest?: string,
-  latest?: string,
+  oldest: Date,
+  latest: Date,
   inclusive?: boolean,
   limit?: number,
   cursor?: string
@@ -35,9 +35,9 @@ export const conversationsHistory = (
     channel,
     cursor,
     inclusive,
-    latest,
     limit,
-    oldest,
+    latest: String(Math.floor(latest.getTime() / 1000)),
+    oldest: String(Math.floor(oldest.getTime() / 1000)),
   });
 
 export const usersList = (
