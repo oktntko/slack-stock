@@ -7,4 +7,6 @@ type Config = {
   slack_config: Record<string, SlackConfig>;
 };
 
-type FetchSelection = "message" | "user" | "channel";
+type DataType = "message" | "user" | "channel";
+
+type OutputType = "console" | "csv" | "tsv" | "json" | "excel";

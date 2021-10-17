@@ -46,28 +46,64 @@ export const selectMenu = async () => {
   return want;
 };
 
-export const selectFetchData = async (
-  data?: FetchSelection
-): Promise<FetchSelection> => {
+export const selectDataType = async (data?: DataType): Promise<DataType> => {
   if (data) return data;
 
   const { selection } = await inquirer.prompt([
     {
       type: "list",
       name: "selection",
-      message: "What data do you want to fetch?",
+      message: "What data do you want to do?",
       choices: [
         {
-          name: "💬Fetch message",
+          name: "💬 Message",
           value: "message",
         },
         {
-          name: "👤Fetch user",
+          name: "👤 User",
           value: "user",
         },
         {
-          name: "📺Fetch channel",
+          name: "📺 Channel",
           value: "channel",
+        },
+      ],
+    },
+  ]);
+
+  return selection;
+};
+
+export const selectOutputType = async (
+  data?: OutputType
+): Promise<OutputType> => {
+  if (data) return data;
+
+  const { selection } = await inquirer.prompt([
+    {
+      type: "list",
+      name: "selection",
+      message: "What output type do you want to do?",
+      choices: [
+        {
+          name: "🎛️ Console",
+          value: "console",
+        },
+        {
+          name: "📁 Csv",
+          value: "csv",
+        },
+        {
+          name: "📑 Tsv",
+          value: "tsv",
+        },
+        {
+          name: "{} JSON",
+          value: "json",
+        },
+        {
+          name: "  Excel",
+          value: "excel",
         },
       ],
     },

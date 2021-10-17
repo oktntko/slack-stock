@@ -4,7 +4,7 @@ import {
   convertMessageFromSlackToStock,
   convertUserFromSlackToStock,
 } from "@/converter";
-import { selectChannel, selectDate, selectFetchData } from "@/interactive";
+import { selectChannel, selectDate, selectDataType } from "@/interactive";
 import ORM from "@/wrapper/ORM";
 import {
   conversationsHistory,
@@ -18,7 +18,6 @@ export default class Fetch extends Command {
 
   static flags = {
     help: flags.help({ char: "h" }),
-    // flag with a value (-n, --name=VALUE)
     name: flags.string({
       char: "n",
       description: "slack name from config file",
@@ -55,13 +54,13 @@ export default class Fetch extends Command {
 }
 
 const fetch = async (
-  data?: FetchSelection,
+  data?: DataType,
   name?: string,
   channel?: string,
   from?: string,
   to?: string
 ) => {
-  const selection = await selectFetchData(data);
+  const selection = await selectDataType(data);
 
   const config = loadSlackConfig(name);
 
@@ -145,7 +144,7 @@ const fetchChannels = async (token: string) => {
   }
 };
 
-export const fetchUsers = async (token: string) => {
+const fetchUsers = async (token: string) => {
   const { ok, members } = await usersList(token);
   if (!ok || !members) {
     throw new Error();
