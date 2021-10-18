@@ -32,16 +32,31 @@ USAGE
 # Commands
 
 <!-- commands -->
-* [`slst config [FILE]`](#slst-config-file)
+* [`slst config`](#slst-config)
+* [`slst contact [FILE]`](#slst-contact-file)
 * [`slst help [COMMAND]`](#slst-help-command)
 
-## `slst config [FILE]`
+## `slst config`
 
 describe the command here
 
 ```
 USAGE
-  $ slst config [FILE]
+  $ slst config
+
+OPTIONS
+  -h, --help  show CLI help
+```
+
+_See code: [src/commands/config.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/config.ts)_
+
+## `slst contact [FILE]`
+
+describe the command here
+
+```
+USAGE
+  $ slst contact [FILE]
 
 OPTIONS
   -f, --force
@@ -49,7 +64,7 @@ OPTIONS
   -n, --name=name  name to print
 ```
 
-_See code: [src/commands/config.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/config.ts)_
+_See code: [src/commands/contact.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/contact.ts)_
 
 ## `slst help [COMMAND]`
 

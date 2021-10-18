@@ -1,4 +1,5 @@
 import { config, isExistsConfigFile } from "@/commands/config";
+import { contact } from "@/commands/contact";
 import { fetch } from "@/commands/fetch";
 import { output } from "@/commands/output";
 import { selectMenu } from "@/interactive";
@@ -40,6 +41,8 @@ hello world from ./src/hello.ts!
           return;
         case "tutorial":
         case "contact":
+          contact();
+          return;
         case "exit":
           this.exit();
       }
