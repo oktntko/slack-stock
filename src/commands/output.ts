@@ -51,7 +51,7 @@ export default class Output extends Command {
   }
 }
 
-const output = async (
+export const output = async (
   data?: DataType,
   output?: OutputType,
   channel?: string,

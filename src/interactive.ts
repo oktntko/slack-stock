@@ -1,49 +1,43 @@
-import {
-  createDefaultConfigFile,
-  isExistsConfigFile,
-  loadConfig,
-  saveConfig,
-} from "@/config";
 import inquirer from "@/wrapper/inquirer";
 import ORM from "@/wrapper/ORM";
 
-export const selectMenu = async () => {
-  const { want } = await inquirer.prompt([
+export const selectMenu = async (): Promise<MenuSelection> => {
+  const { menu } = await inquirer.prompt([
     {
       type: "list",
-      name: "want",
+      name: "menu",
       message: "What do you want to do?",
       choices: [
         {
-          name: "🔄Fetch data",
-          value: "Fetch data",
+          name: "🔄 Fetch data",
+          value: "fetch",
         },
         {
-          name: "📥Export data",
-          value: "Export data",
+          name: "📥 Output data",
+          value: "output",
         },
         new inquirer.Separator("Other"),
         {
-          name: "📝Edit config",
-          value: "Edit config",
+          name: "📝 Edit config",
+          value: "config",
         },
         {
-          name: "📚Check usage",
-          value: "Check usage",
+          name: "📚 Check usage",
+          value: "tutorial",
         },
         {
-          name: "📞Contact support",
-          value: "Contact support",
+          name: "📞 Contact support",
+          value: "contact",
         },
         {
-          name: "💨Exit",
-          value: "Exit",
+          name: "💨 Exit",
+          value: "exit",
         },
       ],
     },
   ]);
 
-  return want;
+  return menu;
 };
 
 export const selectDataType = async (data?: DataType): Promise<DataType> => {
@@ -86,7 +80,7 @@ export const selectOutputType = async (
       message: "What output type do you want to do?",
       choices: [
         {
-          name: "🎛️ Console",
+          name: "🔲 Console",
           value: "console",
         },
         {
@@ -178,66 +172,4 @@ export const selectDate = async (
   ]);
 
   return selection;
-};
-
-export const editConfig = async () => {
-  if (!isExistsConfigFile()) {
-    createDefaultConfigFile();
-    console.log("Created default config file.");
-  }
-
-  while (true) {
-    const config = loadConfig();
-
-    const { editMenu } = await inquirer.prompt([
-      {
-        type: "list",
-        name: "editMenu",
-        message: "What do you want to edit?",
-        choices: ["default", "slack config"],
-      },
-    ]);
-
-    if (editMenu === "default") {
-      const { slackName } = await inquirer.prompt([
-        {
-          type: "list",
-          name: "slackName",
-          message: "Select default slack name.",
-          choices: Object.keys(config.slack_config),
-        },
-      ]);
-
-      config.default = slackName;
-    } else if (editMenu === "slack config") {
-      const { slackName, token } = await inquirer.prompt([
-        {
-          type: "list",
-          name: "slackName",
-          message: "Select edit token slack name.",
-          choices: Object.keys(config.slack_config),
-        },
-        {
-          type: "input",
-          name: "token",
-          message: "Input slack token.",
-        },
-      ]);
-
-      config.slack_config[slackName].token = token;
-    }
-
-    saveConfig(config);
-
-    const { isContinue } = await inquirer.prompt([
-      {
-        type: "confirm",
-        name: "isContinue",
-        message: "Continue edit config?",
-        default: false,
-      },
-    ]);
-
-    if (!isContinue) break;
-  }
 };

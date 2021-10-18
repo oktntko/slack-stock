@@ -2,10 +2,18 @@ type SlackConfig = {
   token: string;
 };
 
-type Config = {
+type Slstrc = {
   default: string;
   slack_config: Record<string, SlackConfig>;
 };
+
+type MenuSelection =
+  | "fetch"
+  | "output"
+  | "config"
+  | "tutorial"
+  | "contact"
+  | "exit";
 
 type DataType = "message" | "user" | "channel";
 

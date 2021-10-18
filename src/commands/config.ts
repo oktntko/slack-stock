@@ -1,16 +1,45 @@
-import yaml from "js-yaml";
+import { Command, flags } from "@oclif/command";
+import { execSync, spawn } from "child_process";
 import fs from "fs";
-import path from "path";
+import yaml from "js-yaml";
 import os from "os";
+import path from "path";
 
 const SLSTRC = path.join(os.homedir(), ".slstrc");
+
+export default class Config extends Command {
+  static description = "describe the command here";
+
+  static flags = {
+    help: flags.help({ char: "h" }),
+  };
+
+  async run() {
+    await config();
+  }
+}
+
+export const config = async () => {
+  if (!isExistsConfigFile()) createDefaultConfigFile();
+
+  if (isWin32()) {
+    // TODO
+    execSync(`start ${SLSTRC}`);
+  } else {
+    spawn(process.env.EDITOR ?? "vi", [SLSTRC], {
+      stdio: [process.stdin, process.stdout, process.stderr],
+    });
+  }
+};
+
+const isWin32 = (): boolean => process.platform === "win32";
 
 export const isExistsConfigFile = (): boolean => {
   return fs.existsSync(SLSTRC);
 };
 
 export const createDefaultConfigFile = () => {
-  const defaultConfig: Config = {
+  const defaultConfig: Slstrc = {
     default: "my-slack",
     slack_config: {
       "my-slack": {
@@ -22,7 +51,7 @@ export const createDefaultConfigFile = () => {
   saveConfig(defaultConfig);
 };
 
-export const loadConfig = (): Config => {
+export const loadConfig = (): Slstrc => {
   try {
     const config = yaml.load(fs.readFileSync(SLSTRC, "utf8"));
 
@@ -41,12 +70,12 @@ export const loadSlackConfig = (name?: string): SlackConfig => {
   return config.slack_config[name ? name : config.default];
 };
 
-export const saveConfig = (config: Config): void => {
+const saveConfig = (config: Slstrc): void => {
   const yamlText = yaml.dump(config);
   fs.writeFileSync(SLSTRC, yamlText, "utf8");
 };
 
-const isConfig = (unkownConfig: unknown): unkownConfig is Config => {
+const isConfig = (unkownConfig: unknown): unkownConfig is Slstrc => {
   if (typeof unkownConfig !== "object" || unkownConfig == null) {
     return false;
   }

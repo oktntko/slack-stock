@@ -1,10 +1,10 @@
-import { loadSlackConfig } from "@/config";
+import { loadSlackConfig } from "@/commands/config";
 import {
   convertChannelFromSlackToStock,
   convertMessageFromSlackToStock,
   convertUserFromSlackToStock,
 } from "@/converter";
-import { selectChannel, selectDate, selectDataType } from "@/interactive";
+import { selectChannel, selectDataType, selectDate } from "@/interactive";
 import ORM from "@/wrapper/ORM";
 import {
   conversationsHistory,
@@ -53,7 +53,7 @@ export default class Fetch extends Command {
   }
 }
 
-const fetch = async (
+export const fetch = async (
   data?: DataType,
   name?: string,
   channel?: string,

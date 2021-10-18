@@ -1,9 +1,11 @@
-import { isExistsConfigFile } from "@/config";
-import { editConfig, selectMenu } from "@/interactive";
-import ORM from "@/wrapper/ORM";
+import { config, isExistsConfigFile } from "@/commands/config";
+import { fetch } from "@/commands/fetch";
+import { output } from "@/commands/output";
+import { selectMenu } from "@/interactive";
 import { Command, flags } from "@oclif/command";
 
 export default class Hello extends Command {
+  static aliases = [""];
   static description = "describe the command here";
 
   static examples = [
@@ -25,10 +27,25 @@ hello world from ./src/hello.ts!
   async run() {
     if (isExistsConfigFile()) {
       // コンフィグファイルがある場合、メニュー
-      selectMenu();
+      const menu = await selectMenu();
+      switch (menu) {
+        case "fetch":
+          await fetch();
+          return;
+        case "output":
+          await output();
+          return;
+        case "config":
+          await config();
+          return;
+        case "tutorial":
+        case "contact":
+        case "exit":
+          this.exit();
+      }
     } else {
       // コンフィグファイルがない場合、チュートリアル
-      editConfig();
+      // TODO
     }
   }
 }
