@@ -1,8 +1,8 @@
-import inquirer from "@/wrapper/inquirer";
-import ORM from "@/wrapper/ORM";
+import { INTERACTIVE } from "./wrapper";
+import { mapper } from "./db";
 
 export const selectMenu = async (): Promise<MenuSelection> => {
-  const { menu } = await inquirer.prompt([
+  const { menu } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "menu",
@@ -16,7 +16,7 @@ export const selectMenu = async (): Promise<MenuSelection> => {
           name: "📥 View data",
           value: "view",
         },
-        new inquirer.Separator("Other"),
+        new INTERACTIVE.Separator("Other"),
         {
           name: "📝 Edit config",
           value: "config",
@@ -43,7 +43,7 @@ export const selectMenu = async (): Promise<MenuSelection> => {
 export const selectDataType = async (input?: DataType): Promise<DataType> => {
   if (input) return input;
 
-  const { selection } = await inquirer.prompt([
+  const { selection } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "selection",
@@ -73,7 +73,7 @@ export const selectOutputType = async (
 ): Promise<OutputType> => {
   if (input) return input;
 
-  const { selection } = await inquirer.prompt([
+  const { selection } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "selection",
@@ -107,9 +107,9 @@ export const selectOutputType = async (
 };
 
 export const selectChannel = async (input?: string): Promise<string> => {
-  const channels = await ORM.channel.findMany();
+  const channels = mapper.channel.findMany();
 
-  if (channels == null || channels.length <= 0) {
+  if (channels.length === 0) {
     throw new Error("please first fetch channel");
   }
 
@@ -125,7 +125,7 @@ export const selectChannel = async (input?: string): Promise<string> => {
     }
   }
 
-  const { channel_id } = await inquirer.prompt([
+  const { channel_id } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "channel_id",
@@ -153,7 +153,7 @@ export const selectDate = async (
     }
   }
 
-  const { selection } = await inquirer.prompt([
+  const { selection } = await INTERACTIVE.prompt([
     {
       type: "date",
       name: "selection",

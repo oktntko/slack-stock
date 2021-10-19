@@ -1,6 +1,6 @@
-import { hello } from "@/commands";
-import { isExistsConfigFile } from "@/utils";
 import { Command, flags } from "@oclif/command";
+import { hello } from "../commands";
+import { isExistsConfigFile } from "../utils";
 
 export default class Hello extends Command {
   static aliases = [""];
@@ -22,5 +22,9 @@ hello world from ./src/hello.ts!
     } else {
       // TODO: コンフィグファイルがない場合、チュートリアル
     }
+  }
+
+  async catch(err: any) {
+    console.log(err);
   }
 }

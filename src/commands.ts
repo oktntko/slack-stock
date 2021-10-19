@@ -1,4 +1,7 @@
 // ! user interface
+import { execSync, spawn } from "child_process";
+import { cli } from "cli-ux";
+import { DataFrame } from "danfojs-node";
 import {
   fetchChannels,
   fetchMessages,
@@ -6,18 +9,16 @@ import {
   findChannels,
   findMessages,
   findUsers,
-} from "@/api";
+} from "./api";
 import {
   selectChannel,
   selectDataType,
   selectDate,
   selectMenu,
   selectOutputType,
-} from "@/interactive";
-import { isWin32, loadSlackConfig, SLSTRC, yyyyMMdd } from "@/utils";
-import { execSync, spawn } from "child_process";
-import { cli } from "cli-ux";
-import { DataFrame } from "danfojs-node";
+} from "./components";
+import { SLACK_STOCK_RC } from "./const";
+import { isWin32, loadSlackConfig, yyyyMMdd } from "./utils";
 
 ////////////////////////////////////////////////////
 // stock
@@ -155,9 +156,9 @@ export const output = (output: OutputType, df: DataFrame, filePath: string) => {
 ////////////////////////////////////////////////////
 export const config = async () => {
   if (isWin32()) {
-    execSync(`start ${SLSTRC}`);
+    execSync(`start ${SLACK_STOCK_RC}`);
   } else {
-    spawn(process.env.EDITOR ?? "vi", [SLSTRC], {
+    spawn(process.env.EDITOR || "vi", [SLACK_STOCK_RC], {
       stdio: [process.stdin, process.stdout, process.stderr],
     });
   }

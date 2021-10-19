@@ -1,6 +1,6 @@
-import { config } from "@/commands";
-import { createDefaultConfigFile, isExistsConfigFile } from "@/utils";
 import { Command, flags } from "@oclif/command";
+import { config } from "../commands";
+import { createDefaultConfigFile, isExistsConfigFile } from "../utils";
 
 export default class Config extends Command {
   static description = "describe the command here";

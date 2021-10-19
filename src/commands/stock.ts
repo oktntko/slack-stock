@@ -1,6 +1,6 @@
-import { stock } from "@/commands";
-import { isExistsConfigFile } from "@/utils";
 import { Command, flags } from "@oclif/command";
+import { stock } from "../commands";
+import { isExistsConfigFile } from "../utils";
 
 export default class Stock extends Command {
   static description = "describe the command here";

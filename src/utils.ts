@@ -2,18 +2,15 @@
 import dayjs from "dayjs";
 import fs from "fs";
 import yaml from "js-yaml";
-import os from "os";
-import path from "path";
+import { SLACK_STOCK_RC } from "./const";
 
 ////////////////////////////////////////////////////
 // config
 ////////////////////////////////////////////////////
-export const SLSTRC = path.join(os.homedir(), ".slstrc");
-
-export const isExistsConfigFile = (): boolean => fs.existsSync(SLSTRC);
+export const isExistsConfigFile = (): boolean => fs.existsSync(SLACK_STOCK_RC);
 
 export const createDefaultConfigFile = () => {
-  const defaultConfig: Slstrc = {
+  const defaultConfig: SlackStockRc = {
     default: "my-slack",
     slack_config: {
       "my-slack": {
@@ -25,9 +22,9 @@ export const createDefaultConfigFile = () => {
   saveConfig(defaultConfig);
 };
 
-export const loadConfig = (): Slstrc => {
+export const loadConfig = (): SlackStockRc => {
   try {
-    const config = yaml.load(fs.readFileSync(SLSTRC, "utf8"));
+    const config = yaml.load(fs.readFileSync(SLACK_STOCK_RC, "utf8"));
 
     if (isConfig(config)) return config;
 
@@ -44,12 +41,12 @@ export const loadSlackConfig = (name?: string): SlackConfig => {
   return config.slack_config[name ? name : config.default];
 };
 
-const saveConfig = (config: Slstrc): void => {
+const saveConfig = (config: SlackStockRc): void => {
   const yamlText = yaml.dump(config);
-  fs.writeFileSync(SLSTRC, yamlText, "utf8");
+  fs.writeFileSync(SLACK_STOCK_RC, yamlText, "utf8");
 };
 
-const isConfig = (unkownConfig: unknown): unkownConfig is Slstrc => {
+const isConfig = (unkownConfig: unknown): unkownConfig is SlackStockRc => {
   if (typeof unkownConfig !== "object" || unkownConfig == null) {
     return false;
   }

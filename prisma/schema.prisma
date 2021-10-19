@@ -12,17 +12,17 @@ generator client {
 
 // https://api.slack.com/types/user
 model User {
-  user_id             String  @id
+  user_id             String @id
   team_id             String // ワークスペースの ID
   real_name           String // The real name that the user specified in their workspace profile.
-  is_admin            Boolean // Indicates whether the user is an Admin of the current workspace.
-  is_owner            Boolean // Indicates whether the user is an Owner of the current workspace.
-  is_primary_owner    Boolean // Indicates whether the user is the Primary Owner of the current workspace.
-  is_restricted       Boolean // Indicates whether or not the user is a guest user. Use in combination with the is_ultra_restricted field to check if the user is a single-channel guest user.
-  is_ultra_restricted Boolean // Indicates whether or not the user is a single-channel guest.
-  is_app_user         Boolean // Indicates whether the user is an authorized user of the calling app.
-  is_bot              Boolean // Indicates whether the user is actually a bot user. Bleep bloop. Note that Slackbot is special so is_bot will be false for it.
-  deleted             Boolean // This user has been deactivated when the value of this field is true. Otherwise the value is false or the field may not appear at all.
+  is_admin            Int // Indicates whether the user is an Admin of the current workspace.
+  is_owner            Int // Indicates whether the user is an Owner of the current workspace.
+  is_primary_owner    Int // Indicates whether the user is the Primary Owner of the current workspace.
+  is_restricted       Int // Indicates whether or not the user is a guest user. Use in combination with the is_ultra_restricted field to check if the user is a single-channel guest user.
+  is_ultra_restricted Int // Indicates whether or not the user is a single-channel guest.
+  is_app_user         Int // Indicates whether the user is an authorized user of the calling app.
+  is_bot              Int // Indicates whether the user is actually a bot user. Bleep bloop. Note that Slackbot is special so is_bot will be false for it.
+  deleted             Int // This user has been deactivated when the value of this field is true. Otherwise the value is false or the field may not appear at all.
 
   Messages Message[]
   @@map("users")
@@ -30,19 +30,19 @@ model User {
 
 // https://api.slack.com/types/conversation
 model Channel {
-  channel_id            String  @id
+  channel_id            String @id
   name                  String
-  is_channel            Boolean
-  is_group              Boolean
-  is_im                 Boolean
-  is_mpim               Boolean
-  is_private            Boolean
-  is_archived           Boolean
-  is_general            Boolean
-  is_shared             Boolean
-  is_org_shared         Boolean
-  is_pending_ext_shared Boolean
-  is_ext_shared         Boolean
+  is_channel            Int
+  is_group              Int
+  is_im                 Int
+  is_mpim               Int
+  is_private            Int
+  is_archived           Int
+  is_general            Int
+  is_shared             Int
+  is_org_shared         Int
+  is_pending_ext_shared Int
+  is_ext_shared         Int
 
   Messages Message[]
   @@map("channels")

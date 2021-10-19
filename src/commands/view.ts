@@ -1,5 +1,5 @@
-import { view } from "@/commands";
 import { Command, flags } from "@oclif/command";
+import { view } from "../commands";
 
 export default class View extends Command {
   static description = "describe the command here";

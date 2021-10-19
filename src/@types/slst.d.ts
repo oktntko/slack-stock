@@ -2,7 +2,7 @@ type SlackConfig = {
   token: string;
 };
 
-type Slstrc = {
+type SlackStockRc = {
   default: string;
   slack_config: Record<string, SlackConfig>;
 };
