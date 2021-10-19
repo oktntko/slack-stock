@@ -9,12 +9,12 @@ export const selectMenu = async (): Promise<MenuSelection> => {
       message: "What do you want to do?",
       choices: [
         {
-          name: "🔄 Fetch data",
-          value: "fetch",
+          name: "🔄 Stock data",
+          value: "stock",
         },
         {
-          name: "📥 Output data",
-          value: "output",
+          name: "📥 View data",
+          value: "view",
         },
         new inquirer.Separator("Other"),
         {
@@ -40,8 +40,8 @@ export const selectMenu = async (): Promise<MenuSelection> => {
   return menu;
 };
 
-export const selectDataType = async (data?: DataType): Promise<DataType> => {
-  if (data) return data;
+export const selectDataType = async (input?: DataType): Promise<DataType> => {
+  if (input) return input;
 
   const { selection } = await inquirer.prompt([
     {
@@ -69,9 +69,9 @@ export const selectDataType = async (data?: DataType): Promise<DataType> => {
 };
 
 export const selectOutputType = async (
-  data?: OutputType
+  input?: OutputType
 ): Promise<OutputType> => {
-  if (data) return data;
+  if (input) return input;
 
   const { selection } = await inquirer.prompt([
     {
@@ -106,18 +106,18 @@ export const selectOutputType = async (
   return selection;
 };
 
-export const selectChannel = async (channelInput?: string): Promise<string> => {
+export const selectChannel = async (input?: string): Promise<string> => {
   const channels = await ORM.channel.findMany();
 
   if (channels == null || channels.length <= 0) {
     throw new Error("please first fetch channel");
   }
 
-  if (channelInput) {
+  if (input) {
     const channel = channels.find(
-      (channel) =>
-        channel.channel_id === channelInput || channel.name === channelInput
+      (channel) => channel.channel_id === input || channel.name === input
     );
+
     if (channel) {
       return channel.channel_id;
     } else {
@@ -142,10 +142,10 @@ export const selectChannel = async (channelInput?: string): Promise<string> => {
 
 export const selectDate = async (
   message: string,
-  dateInput?: string
+  input?: string
 ): Promise<Date> => {
-  if (dateInput) {
-    const date = new Date(dateInput);
+  if (input) {
+    const date = new Date(input);
     if (!Number.isNaN(date.getTime())) {
       return new Date(date.setHours(0, 0, 0, 0));
     } else {

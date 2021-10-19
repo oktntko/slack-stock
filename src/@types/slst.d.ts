@@ -8,8 +8,8 @@ type Slstrc = {
 };
 
 type MenuSelection =
-  | "fetch"
-  | "output"
+  | "stock"
+  | "view"
   | "config"
   | "tutorial"
   | "contact"
