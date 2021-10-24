@@ -1,10 +1,76 @@
+import { LogLevel, WebClient } from "@slack/web-api";
 import {
   convertChannelFromSlackToStock,
   convertMessageFromSlackToStock,
   convertUserFromSlackToStock,
 } from "./converter";
 import { mapper } from "./db";
-import { CHAT } from "./wrapper";
+
+////////////////////////////////////////////////////
+// client
+////////////////////////////////////////////////////
+const client = new WebClient(undefined, {
+  logLevel: LogLevel.DEBUG,
+});
+
+const CHAT = {
+  conversations: {
+    list(
+      token: string,
+      exclude_archived?: boolean,
+      types?: "public_channel" | "private_channel" | "mpim" | "im",
+      team_id?: string,
+      limit?: number,
+      cursor?: string
+    ) {
+      return client.conversations.list({
+        token,
+        cursor,
+        exclude_archived,
+        limit,
+        team_id,
+        types,
+      });
+    },
+    history(
+      token: string,
+      channel: string,
+      oldest: Date,
+      latest: Date,
+      inclusive?: boolean,
+      limit?: number,
+      cursor?: string
+    ) {
+      return client.conversations.history({
+        token,
+        channel,
+        cursor,
+        inclusive,
+        limit,
+        latest: String(Math.floor(latest.getTime() / 1000)),
+        oldest: String(Math.floor(oldest.getTime() / 1000)),
+      });
+    },
+  },
+
+  users: {
+    list(
+      token: string,
+      team_id?: string,
+      include_locale?: boolean,
+      limit?: number,
+      cursor?: string
+    ) {
+      return client.users.list({
+        token,
+        cursor,
+        include_locale,
+        limit,
+        team_id,
+      });
+    },
+  },
+};
 
 ////////////////////////////////////////////////////
 // fetch
@@ -15,7 +81,7 @@ export const fetchMessages = async (
   oldest: Date,
   latest: Date
 ) => {
-  const { ok, messages } = await CHAT.conversationsHistory(
+  const { ok, messages } = await CHAT.conversations.history(
     token,
     channel_id,
     oldest,
@@ -33,7 +99,7 @@ export const fetchMessages = async (
 };
 
 export const fetchUsers = async (token: string) => {
-  const { ok, members } = await CHAT.usersList(token);
+  const { ok, members } = await CHAT.users.list(token);
   if (!ok || !members) {
     throw new Error();
   }
@@ -45,7 +111,7 @@ export const fetchUsers = async (token: string) => {
 };
 
 export const fetchChannels = async (token: string) => {
-  const { ok, channels } = await CHAT.conversationsList(token);
+  const { ok, channels } = await CHAT.conversations.list(token);
   if (!ok || !channels) {
     throw new Error();
   }

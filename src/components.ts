@@ -1,5 +1,14 @@
-import { INTERACTIVE } from "./wrapper";
+import inquirer from "inquirer";
 import { mapper } from "./db";
+
+inquirer.registerPrompt(
+  "autocomplete",
+  require("inquirer-autocomplete-prompt")
+);
+// https://intl-date-time-format-checker.pages.dev/
+inquirer.registerPrompt("date", require("inquirer-date-prompt"));
+
+const INTERACTIVE = inquirer;
 
 export const selectMenu = async (): Promise<MenuSelection> => {
   const { menu } = await INTERACTIVE.prompt([
