@@ -1,7 +1,8 @@
 // ! user interface
 import { Channel, Message, User } from "@prisma/client";
-import { execSync, spawn } from "child_process";
+import { execSync, spawnSync } from "child_process";
 import { cli } from "cli-ux";
+import dayjs from "dayjs";
 import {
   fetchChannels,
   fetchMessages,
@@ -17,9 +18,16 @@ import {
   selectMenu,
   selectOutputType,
 } from "./components";
-import { SLACK_STOCK_RC } from "./const";
+import { DB_PATH, SLACK_STOCK_RC } from "./const";
+import { mapper } from "./db";
 import { output } from "./output";
-import { isWin32, loadSlackConfig, yyyyMMdd } from "./utils";
+import {
+  createDefaultConfigFile,
+  isExistsConfigFile,
+  isWin32,
+  loadSlackConfig,
+  yyyyMMdd,
+} from "./utils";
 
 ////////////////////////////////////////////////////
 // stock
@@ -72,6 +80,17 @@ export const stockUsers = async (token: string) => {
 
 export const stockChannels = async (token: string) => {
   await fetchChannels(token);
+};
+
+export const stockAll = async (token: string) => {
+  await fetchUsers(token);
+  await fetchChannels(token);
+  const channels = mapper.channel.findMany();
+  const oldest = dayjs().startOf("months").toDate();
+  const latest = dayjs().endOf("months").toDate();
+  for (const channel of channels) {
+    await fetchMessages(token, channel.channel_id, oldest, latest);
+  }
 };
 
 ////////////////////////////////////////////////////
@@ -136,7 +155,7 @@ export const config = async () => {
   if (isWin32()) {
     execSync(`start ${SLACK_STOCK_RC}`);
   } else {
-    spawn(process.env.EDITOR || "vi", [SLACK_STOCK_RC], {
+    spawnSync(process.env.EDITOR || "vi", [SLACK_STOCK_RC], {
       stdio: [process.stdin, process.stdout, process.stderr],
     });
   }
@@ -145,9 +164,32 @@ export const config = async () => {
 ////////////////////////////////////////////////////
 // tutorial
 ////////////////////////////////////////////////////
-export const tutorial = () => {
-  console.log("📞 please visit github and use issues or PR");
-  cli.open("https://github.com/oktntko/slack-stock");
+export const tutorial = async () => {
+  // (cli)  コンフィグファイルがない場合作成する
+  if (!isExistsConfigFile()) {
+    createDefaultConfigFile();
+    console.log(`🆗 Config file created, see path: "${SLACK_STOCK_RC}"`);
+  }
+  // (cli)  token の取得方法を表示する
+  console.log("📥 Please setup slack app and copy token");
+  cli.open("https://github.com/oktntko/slack-stock#setup-slack-app");
+  await cli.anykey();
+
+  // (cli)  コンフィグファイルをオープンする
+  console.log(`📝 Input token you got from slack app.`);
+  await config();
+
+  // (cli)  データを取得する
+  const { token } = loadSlackConfig();
+  await stockAll(token);
+  console.log(`🆗 Stocked all data. see path: "${DB_PATH}"`);
+
+  // (cli)  データを出力する
+  console.log(`💡 You can view data, please select data you want to view.`);
+  await view();
+
+  // (cli)  テキストを表示して終了する
+  console.log(`☺️ Finish! Have a great Slack Life with slack-stock!`);
 };
 
 ////////////////////////////////////////////////////

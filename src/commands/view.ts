@@ -2,7 +2,7 @@ import { Command, flags } from "@oclif/command";
 import { view } from "../commands";
 
 export default class View extends Command {
-  static description = "describe the command here";
+  static description = "View data";
 
   static flags = {
     help: flags.help({ char: "h" }),

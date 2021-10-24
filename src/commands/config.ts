@@ -3,7 +3,7 @@ import { config } from "../commands";
 import { createDefaultConfigFile, isExistsConfigFile } from "../utils";
 
 export default class Config extends Command {
-  static description = "describe the command here";
+  static description = "Edit config";
 
   static flags = {
     help: flags.help({ char: "h" }),

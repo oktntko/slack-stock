@@ -3,7 +3,7 @@ import { stock } from "../commands";
 import { isExistsConfigFile } from "../utils";
 
 export default class Stock extends Command {
-  static description = "describe the command here";
+  static description = "Stock data";
 
   static flags = {
     help: flags.help({ char: "h" }),

@@ -1,10 +1,10 @@
 import { Command, flags } from "@oclif/command";
-import { hello } from "../commands";
+import { hello, tutorial } from "../commands";
 import { isExistsConfigFile } from "../utils";
 
 export default class Hello extends Command {
   static aliases = [""];
-  static description = "describe the command here";
+  static description = "Select menu";
 
   static examples = [
     `$ slst hello
@@ -20,7 +20,7 @@ hello world from ./src/hello.ts!
     if (isExistsConfigFile()) {
       await hello();
     } else {
-      // TODO: コンフィグファイルがない場合、チュートリアル
+      await tutorial();
     }
   }
 
