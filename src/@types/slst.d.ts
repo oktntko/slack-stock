@@ -17,4 +17,4 @@ type MenuSelection =
 
 type DataType = "message" | "user" | "channel";
 
-type OutputType = "console" | "csv" | "tsv" | "json" | "excel";
+type OutputType = "console" | "csv" | "tsv" | "excel";

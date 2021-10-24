@@ -1,7 +1,7 @@
 // ! user interface
+import { Channel, Message, User } from "@prisma/client";
 import { execSync, spawn } from "child_process";
 import { cli } from "cli-ux";
-import { DataFrame } from "danfojs-node";
 import {
   fetchChannels,
   fetchMessages,
@@ -18,6 +18,7 @@ import {
   selectOutputType,
 } from "./components";
 import { SLACK_STOCK_RC } from "./const";
+import { output } from "./output";
 import { isWin32, loadSlackConfig, yyyyMMdd } from "./utils";
 
 ////////////////////////////////////////////////////
@@ -86,13 +87,13 @@ export const view = async (
 ) => {
   const dataTypeSelection = await selectDataType(dataType);
 
-  const df = await pick(dataTypeSelection, channel, from, to);
+  const data = await pick(dataTypeSelection, channel, from, to);
 
   const outputTypeSelection = await selectOutputType(outputType);
 
-  const filePath = `./${yyyyMMdd()}_${dataTypeSelection}.${outputTypeSelection}`;
+  const fileName = `./${yyyyMMdd()}_${dataTypeSelection}.${outputTypeSelection}`;
 
-  output(outputTypeSelection, df, filePath);
+  await output(outputTypeSelection, data, fileName);
 };
 
 export const pick = async (
@@ -100,17 +101,14 @@ export const pick = async (
   channel?: string,
   from?: string,
   to?: string
-): Promise<DataFrame> => {
+): Promise<Message[] | User[] | Channel[]> => {
   switch (data) {
     case "message":
-      const messages = await pickMessages(channel, from, to);
-      return new DataFrame(messages);
+      return await pickMessages(channel, from, to);
     case "user":
-      const users = await pickUsers();
-      return new DataFrame(users);
+      return await pickUsers();
     case "channel":
-      const channels = await pickChannels();
-      return new DataFrame(channels);
+      return await pickChannels();
   }
 };
 
@@ -130,26 +128,6 @@ export const pickMessages = async (
 export const pickUsers = async () => await findUsers();
 
 export const pickChannels = async () => await findChannels();
-
-export const output = (output: OutputType, df: DataFrame, filePath: string) => {
-  switch (output) {
-    case "console":
-      df.print();
-      break;
-    case "csv":
-      df.to_csv({ filePath, sep: ",", header: true });
-      break;
-    case "tsv":
-      df.to_csv({ filePath, sep: "\t", header: true });
-      break;
-    case "json":
-      df.to_json({ filePath, format: "column" });
-      break;
-    case "excel":
-      df.to_excel({ filePath });
-      break;
-  }
-};
 
 ////////////////////////////////////////////////////
 // config
