@@ -92,10 +92,6 @@ export const selectOutputType = async (
           value: "tsv",
         },
         {
-          name: "{} JSON",
-          value: "json",
-        },
-        {
           name: "  Excel",
           value: "excel",
         },
