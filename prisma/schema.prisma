@@ -10,11 +10,23 @@ generator client {
   provider = "prisma-client-js"
 }
 
+// https://api.slack.com/methods/team.info
+model Team {
+  team_id   String @id
+  team_name String @unique // The real name that the user specified in their workspace profile.
+  token     String
+
+  user    User[]
+  channel Channel[]
+  message Message[]
+  @@map("teams")
+}
+
 // https://api.slack.com/types/user
 model User {
   user_id             String @id
   team_id             String // ワークスペースの ID
-  real_name           String // The real name that the user specified in their workspace profile.
+  user_name           String // The real name that the user specified in their workspace profile.
   is_admin            Int // Indicates whether the user is an Admin of the current workspace.
   is_owner            Int // Indicates whether the user is an Owner of the current workspace.
   is_primary_owner    Int // Indicates whether the user is the Primary Owner of the current workspace.
@@ -24,14 +36,16 @@ model User {
   is_bot              Int // Indicates whether the user is actually a bot user. Bleep bloop. Note that Slackbot is special so is_bot will be false for it.
   deleted             Int // This user has been deactivated when the value of this field is true. Otherwise the value is false or the field may not appear at all.
 
-  Messages Message[]
+  team     Team      @relation(fields: [team_id], references: [team_id])
+  messages Message[]
   @@map("users")
 }
 
 // https://api.slack.com/types/conversation
 model Channel {
   channel_id            String @id
-  name                  String
+  team_id               String
+  channel_name          String
   is_channel            Int
   is_group              Int
   is_im                 Int
@@ -44,21 +58,24 @@ model Channel {
   is_pending_ext_shared Int
   is_ext_shared         Int
 
-  Messages Message[]
+  team     Team      @relation(fields: [team_id], references: [team_id])
+  messages Message[]
   @@map("channels")
 }
 
 // https://api.slack.com/types/conversation
 model Message {
   message_id Int    @id @default(autoincrement())
+  team_id    String
   channel_id String
   user_id    String
   ts         String
   type       String
   text       String
 
+  team    Team    @relation(fields: [team_id], references: [team_id])
   channel Channel @relation(fields: [channel_id], references: [channel_id])
-  user    User?   @relation(fields: [user_id], references: [user_id])
-  @@unique([channel_id, user_id, ts, type], name: "unique_message")
+  user    User    @relation(fields: [user_id], references: [user_id])
+  @@unique([team_id, channel_id, user_id, ts, type], name: "unique_message")
   @@map("messages")
 }

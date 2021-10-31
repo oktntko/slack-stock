@@ -1,20 +1,35 @@
+import { Channel, Team } from "@prisma/client";
+import dayjs, { Dayjs } from "dayjs";
 import inquirer from "inquirer";
-import { mapper } from "./db";
-
-inquirer.registerPrompt(
-  "autocomplete",
-  require("inquirer-autocomplete-prompt")
-);
+import { CONTROLLER } from "./middleware-controller";
+import { COLOR } from "./cui-colors";
+inquirer.registerPrompt("autocomplete", require("inquirer-autocomplete-prompt"));
 // https://intl-date-time-format-checker.pages.dev/
 inquirer.registerPrompt("date", require("inquirer-date-prompt"));
 
 const INTERACTIVE = inquirer;
+
+export const inputToken = async (input?: string): Promise<string> => {
+  if (input) return input;
+
+  const { token } = await INTERACTIVE.prompt([
+    {
+      type: "input",
+      name: "token",
+      prefix: COLOR.success("❓"),
+      message: "What is your token?",
+    },
+  ]);
+
+  return token;
+};
 
 export const selectMenu = async (): Promise<MenuSelection> => {
   const { menu } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "menu",
+      prefix: COLOR.success("❓"),
       message: "What do you want to do?",
       choices: [
         {
@@ -27,12 +42,8 @@ export const selectMenu = async (): Promise<MenuSelection> => {
         },
         new INTERACTIVE.Separator("Other"),
         {
-          name: "📝 Edit config",
-          value: "config",
-        },
-        {
-          name: "📚 Check usage",
-          value: "tutorial",
+          name: "📚 Add new workspsace",
+          value: "add",
         },
         {
           name: "📞 Contact support",
@@ -56,6 +67,7 @@ export const selectDataType = async (input?: DataType): Promise<DataType> => {
     {
       type: "list",
       name: "selection",
+      prefix: COLOR.success("❓"),
       message: "What data do you want to do?",
       choices: [
         {
@@ -77,15 +89,14 @@ export const selectDataType = async (input?: DataType): Promise<DataType> => {
   return selection;
 };
 
-export const selectOutputType = async (
-  input?: OutputType
-): Promise<OutputType> => {
+export const selectOutputType = async (input?: OutputType): Promise<OutputType> => {
   if (input) return input;
 
   const { selection } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "selection",
+      prefix: COLOR.success("❓"),
       message: "What output type do you want to do?",
       choices: [
         {
@@ -111,48 +122,76 @@ export const selectOutputType = async (
   return selection;
 };
 
-export const selectChannel = async (input?: string): Promise<string> => {
-  const channels = mapper.channel.findMany();
+export const selectTeam = async (input?: string): Promise<Team> => {
+  const teams = CONTROLLER.teams.find();
+
+  if (teams.length === 0) {
+    throw new Error("please first fetch channel");
+  }
+
+  if (input) {
+    const team = teams.find((team) => team.team_id === input || team.team_name === input);
+
+    if (team) {
+      return team;
+    } else {
+      console.log("you input invalid channel, please select next list");
+    }
+  }
+
+  const { team } = await INTERACTIVE.prompt([
+    {
+      type: "list",
+      name: "team",
+      prefix: COLOR.success("❓"),
+      message: "What data do you want to fetch?",
+      choices: teams.map((team) => ({
+        name: team.team_name,
+        value: team,
+      })),
+    },
+  ]);
+
+  return team;
+};
+
+export const selectChannel = async (input?: string): Promise<Channel> => {
+  const channels = CONTROLLER.channels.find();
 
   if (channels.length === 0) {
     throw new Error("please first fetch channel");
   }
 
   if (input) {
-    const channel = channels.find(
-      (channel) => channel.channel_id === input || channel.name === input
-    );
+    const channel = channels.find((channel) => channel.channel_id === input || channel.channel_name === input);
 
     if (channel) {
-      return channel.channel_id;
+      return channel;
     } else {
       console.log("you input invalid channel, please select next list");
     }
   }
 
-  const { channel_id } = await INTERACTIVE.prompt([
+  const { channel } = await INTERACTIVE.prompt([
     {
       type: "list",
-      name: "channel_id",
+      name: "channel",
+      prefix: COLOR.success("❓"),
       message: "What data do you want to fetch?",
       choices: channels.map((channel) => ({
-        name: channel.name,
-        value: channel.channel_id,
+        name: channel.channel_name,
+        value: channel,
       })),
     },
   ]);
 
-  return channel_id;
+  return channel;
 };
 
-export const selectDate = async (
-  message: string,
-  input?: string
-): Promise<Date> => {
+export const selectDate = async (input?: Dayjs, message?: string, initialiValue?: Dayjs): Promise<Dayjs> => {
   if (input) {
-    const date = new Date(input);
-    if (!Number.isNaN(date.getTime())) {
-      return new Date(date.setHours(0, 0, 0, 0));
+    if (input.isValid()) {
+      return input;
     } else {
       console.log("you input invalid date, please input next");
     }
@@ -162,8 +201,10 @@ export const selectDate = async (
     {
       type: "date",
       name: "selection",
-      message: message,
-      filter: (d: Date) => new Date(d.setHours(0, 0, 0, 0)),
+      prefix: COLOR.success("❓"),
+      message: message ?? "Select date",
+      default: initialiValue ? initialiValue.toDate() : dayjs().toDate(),
+      filter: (d: Date) => dayjs(d),
       format: {
         year: "numeric",
         month: "2-digit",

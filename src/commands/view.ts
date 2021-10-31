@@ -1,5 +1,6 @@
 import { Command, flags } from "@oclif/command";
-import { view } from "../commands";
+import { view } from "../cui";
+import { parsePeriod } from "./stock";
 
 export default class View extends Command {
   static description = "View data";
@@ -8,15 +9,28 @@ export default class View extends Command {
     help: flags.help({ char: "h" }),
     channel: flags.string({
       char: "c",
-      description: "if fetch message data, set channel name or channel id",
+      description: "if stock message data, set channel name or channel id",
     }),
-    from: flags.string({
-      char: "f",
-      description: "if fetch message data, set from date, format=yyyy-MM-dd",
+    period: flags.string({
+      char: "p",
+      multiple: true,
+      exclusive: ["month", "week", "day"],
+      description: "if stock message data, set from date, format=yyyy-MM-dd",
     }),
-    to: flags.string({
-      char: "t",
-      description: "if fetch message data, set to date, format=yyyy-MM-dd",
+    month: flags.boolean({
+      char: "m",
+      exclusive: ["period", "week", "day"],
+      description: "if stock message data, set to date, format=yyyy-MM-dd",
+    }),
+    week: flags.boolean({
+      char: "w",
+      exclusive: ["period", "month", "day"],
+      description: "if stock message data, set to date, format=yyyy-MM-dd",
+    }),
+    day: flags.boolean({
+      char: "d",
+      exclusive: ["period", "week", "month"],
+      description: "if stock message data, set to date, format=yyyy-MM-dd",
     }),
   };
 
@@ -40,6 +54,18 @@ export default class View extends Command {
   async run() {
     const { args, flags } = this.parse(View);
 
-    await view(args.data, args.output, flags.channel, flags.from, flags.to);
+    const period = parsePeriod(flags.period, flags.month, flags.week, flags.day);
+
+    await view(
+      {
+        data: args.data,
+        output: args.output,
+      },
+      {
+        channel: flags.channel,
+        oldest: period.oldest,
+        latest: period.latest,
+      }
+    );
   }
 }

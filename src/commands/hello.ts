@@ -1,6 +1,5 @@
 import { Command, flags } from "@oclif/command";
-import { hello, tutorial } from "../commands";
-import { isExistsConfigFile } from "../utils";
+import { hello } from "../cui";
 
 export default class Hello extends Command {
   static aliases = [""];
@@ -17,14 +16,6 @@ hello world from ./src/hello.ts!
   };
 
   async run() {
-    if (isExistsConfigFile()) {
-      await hello();
-    } else {
-      await tutorial();
-    }
-  }
-
-  async catch(err: any) {
-    console.log(err);
+    await hello();
   }
 }
