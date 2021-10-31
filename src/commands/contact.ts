@@ -1,5 +1,5 @@
 import { Command } from "@oclif/command";
-import { contact } from "../commands";
+import { contact } from "../cui";
 
 export default class Contact extends Command {
   static description = "Contact support";

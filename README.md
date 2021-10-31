@@ -11,7 +11,7 @@
 - [About](#about)
 - [Introduction](#introduction)
 - [Installation](#installation)
-- [Tutorial](#tutorial)
+- [add](#add)
 - [Commands](#commands)
 - [Program Resources](#program-resources)
 <!-- tocstop -->
@@ -136,42 +136,44 @@ USAGE
 - downloads from release page.
 <!-- installationstop -->
 
-# Tutorial
+# add
 
-<!-- tutorial -->
+<!-- add -->
 
 video
 
-<!-- tutorialtop -->
+<!-- addtop -->
 
 # Commands
 
 <!-- commands -->
 
-- [`slst config`](#slst-config)
+- [`slst add [FILE]`](#slst-add-file)
 - [`slst contact`](#slst-contact)
-- [`slst hello`](#slst-hello)
 - [`slst help [COMMAND]`](#slst-help-command)
+- [`slst new-team [FILE]`](#slst-new-team-file)
 - [`slst stock [DATA]`](#slst-stock-data)
 - [`slst view [DATA] [OUTPUT]`](#slst-view-data-output)
 
-## `slst config`
+## `slst add [FILE]`
 
 describe the command here
 
 ```
 USAGE
-  $ slst config
+  $ slst add [FILE]
 
 OPTIONS
-  -h, --help  show CLI help
+  -f, --force
+  -h, --help       show CLI help
+  -n, --name=name  name to print
 ```
 
-_See code: [src/commands/config.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/config.ts)_
+_See code: [src/commands/add.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/add.ts)_
 
 ## `slst contact`
 
-describe the command here
+Contact support
 
 ```
 USAGE
@@ -179,27 +181,6 @@ USAGE
 ```
 
 _See code: [src/commands/contact.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/contact.ts)_
-
-## `slst hello`
-
-describe the command here
-
-```
-USAGE
-  $ slst hello
-
-OPTIONS
-  -h, --help  show CLI help
-
-ALIASES
-  $ slst
-
-EXAMPLE
-  $ slst hello
-  hello world from ./src/hello.ts!
-```
-
-_See code: [src/commands/hello.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/hello.ts)_
 
 ## `slst help [COMMAND]`
 
@@ -218,9 +199,25 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
 
-## `slst stock [DATA]`
+## `slst new-team [FILE]`
 
 describe the command here
+
+```
+USAGE
+  $ slst new-team [FILE]
+
+OPTIONS
+  -f, --force
+  -h, --help       show CLI help
+  -n, --name=name  name to print
+```
+
+_See code: [src/commands/new-team.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/new-team.ts)_
+
+## `slst stock [DATA]`
+
+Stock data
 
 ```
 USAGE
@@ -241,7 +238,7 @@ _See code: [src/commands/stock.ts](https://github.com/cli/slack-stock/blob/v0.0.
 
 ## `slst view [DATA] [OUTPUT]`
 
-describe the command here
+View data
 
 ```
 USAGE
