@@ -1,8 +1,8 @@
-type MenuSelection = "stock" | "view" | "add" | "contact" | "exit";
+type ObjectType = "teams" | "data" | "messages";
 
-type DataType = "message" | "user" | "channel";
+type ActionType = "teams-add" | "teams-remove" | "data-fetch" | "data-view" | "messages-stock" | "messages-view";
 
-type OutputType = "console" | "csv" | "tsv" | "excel";
+type OutputType = "console" | "csv" | "tsv" | "xlsx";
 
 type RequireOne<T, K extends keyof T = keyof T> = K extends keyof T ? PartialRequire<T, K> : never;
 

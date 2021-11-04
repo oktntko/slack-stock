@@ -1,7 +1,8 @@
 import { Team } from "@prisma/client";
 import { Dayjs } from "dayjs";
-import { CHAT_CLIENT } from "./data-access-chat";
-import { DB_CLIENT } from "./data-access-db";
+import { CHAT_CLIENT } from "./dataaccess-chat";
+import { DB_CLIENT } from "./dataaccess-db";
+import { decrypt, encrypt } from "./dataaccess-password";
 import { CONVERTER } from "./middleware-converter";
 
 export const CONTROLLER = {
@@ -11,18 +12,21 @@ export const CONTROLLER = {
       if (res.team == null) throw new Error("An unexpected error has occurred.");
 
       const team = CONVERTER.team.convert({ ...res.team, token });
-      const _ = DB_CLIENT.teams.upsert(team);
+      const _ = DB_CLIENT.teams.upsert({ ...team, token: encrypt(token) });
 
       return team;
     },
   },
   teams: {
     find() {
-      return DB_CLIENT.teams.findMany();
+      return DB_CLIENT.teams.findMany().map((team) => {
+        team.token = decrypt(team.token);
+        return team;
+      });
     },
   },
   users: {
-    async fetch(token: string) {
+    async fetch({ token }: { token: string }) {
       const res = await CHAT_CLIENT.users.list(token);
       if (res.members == null) throw new Error("An unexpected error has occurred.");
 
@@ -30,8 +34,8 @@ export const CONTROLLER = {
         .map((member) => CONVERTER.user.convert(member))
         .map((member) => DB_CLIENT.users.upsert(member));
     },
-    find() {
-      return DB_CLIENT.users.findMany();
+    find(params: { team_id?: string } = {}) {
+      return DB_CLIENT.users.findMany(params);
     },
   },
   channels: {
@@ -43,8 +47,11 @@ export const CONTROLLER = {
         .map((channel) => CONVERTER.channel.convert({ ...channel, team_id }))
         .map((channel) => DB_CLIENT.channels.upsert(channel));
     },
-    find() {
-      return DB_CLIENT.channels.findMany();
+    find(params: { team_id?: string } = {}) {
+      return DB_CLIENT.channels.findMany(params).map((channel) => {
+        channel.token = decrypt(channel.token);
+        return channel;
+      });
     },
   },
   messages: {
@@ -62,8 +69,8 @@ export const CONTROLLER = {
         .map((message) => CONVERTER.message.convert({ ...message, team_id, channel_id }))
         .map((message) => DB_CLIENT.messages.upsert(message));
     },
-    find({ channel_id, oldest, latest }: { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
-      return DB_CLIENT.messages.findMany({ channel_id, oldest, latest });
+    find(params: { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
+      return DB_CLIENT.messages.findMany(params);
     },
   },
 };

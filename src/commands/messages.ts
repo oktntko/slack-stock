@@ -1,9 +1,10 @@
 import { Command, flags } from "@oclif/command";
 import dayjs, { Dayjs } from "dayjs";
-import { stock } from "../cui";
+import { COMMANDS } from "../app/ui-commands";
 
-export default class Stock extends Command {
-  static description = "Stock data";
+export default class Messages extends Command {
+  static aliases = ["m", "message"];
+  static description = "describe the command here";
 
   static flags = {
     help: flags.help({ char: "h" }),
@@ -32,40 +33,52 @@ export default class Stock extends Command {
       exclusive: ["period", "week", "month"],
       description: "if stock message data, set to date, format=yyyy-MM-dd",
     }),
+    output: flags.string({
+      char: "t",
+      description: "Select your output",
+      multiple: false,
+      options: ["console", "csv", "tsv", "xlsx"],
+    }),
   };
 
   static args = [
     {
-      name: "data",
-      description: "select stock data",
+      name: "action",
       required: false,
       hidden: false,
-      options: ["message", "user", "channel"],
-    },
-    {
-      name: "team",
-      description: "select stock team",
-      required: false,
-      hidden: false,
+      options: ["stock", "view"],
     },
   ];
 
   async run() {
-    const { args, flags } = this.parse(Stock);
+    const { args, flags } = this.parse(Messages);
 
     const period = parsePeriod(flags.period, flags.month, flags.week, flags.day);
 
-    await stock(
-      {
-        data: args.data,
-        team: args.team,
-      },
-      {
-        channel: flags.channel,
-        oldest: period.oldest,
-        latest: period.latest,
-      }
-    );
+    switch (args.action) {
+      case "fetch":
+        await COMMANDS.messages.stock({ channel: flags.channel, oldest: period.oldest, latest: period.latest });
+        break;
+      case "view":
+        await COMMANDS.messages.view({
+          channel: flags.channel,
+          oldest: period.oldest,
+          latest: period.latest,
+          output: flags.output as OutputType,
+        });
+        break;
+      default:
+        await COMMANDS.menu(
+          { object: "messages" },
+          {
+            channel: flags.channel,
+            oldest: period.oldest,
+            latest: period.latest,
+            output: flags.output as OutputType,
+          }
+        );
+        break;
+    }
   }
 }
 

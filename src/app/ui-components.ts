@@ -1,8 +1,9 @@
 import { Channel, Team } from "@prisma/client";
+import { cli } from "cli-ux";
 import dayjs, { Dayjs } from "dayjs";
 import inquirer from "inquirer";
 import { CONTROLLER } from "./middleware-controller";
-import { COLOR } from "./cui-colors";
+import { color, icon } from "./ui-helpers";
 inquirer.registerPrompt("autocomplete", require("inquirer-autocomplete-prompt"));
 // https://intl-date-time-format-checker.pages.dev/
 inquirer.registerPrompt("date", require("inquirer-date-prompt"));
@@ -16,7 +17,7 @@ export const inputToken = async (input?: string): Promise<string> => {
     {
       type: "input",
       name: "token",
-      prefix: COLOR.success("❓"),
+      prefix: icon.question,
       message: "What is your token?",
     },
   ]);
@@ -24,65 +25,83 @@ export const inputToken = async (input?: string): Promise<string> => {
   return token;
 };
 
-export const selectMenu = async (): Promise<MenuSelection> => {
-  const { menu } = await INTERACTIVE.prompt([
+export const inputDate = async (input?: Dayjs, message?: string, initialiValue?: Dayjs): Promise<Dayjs> => {
+  if (input) {
+    if (input.isValid()) {
+      return input;
+    } else {
+      cli.info(`${icon.warn} Got invalid date, please input next`);
+    }
+  }
+
+  const { selection } = await INTERACTIVE.prompt([
     {
-      type: "list",
-      name: "menu",
-      prefix: COLOR.success("❓"),
-      message: "What do you want to do?",
-      choices: [
-        {
-          name: "🔄 Stock data",
-          value: "stock",
-        },
-        {
-          name: "📥 View data",
-          value: "view",
-        },
-        new INTERACTIVE.Separator("Other"),
-        {
-          name: "📚 Add new workspsace",
-          value: "add",
-        },
-        {
-          name: "📞 Contact support",
-          value: "contact",
-        },
-        {
-          name: "💨 Exit",
-          value: "exit",
-        },
-      ],
+      type: "date",
+      name: "selection",
+      prefix: icon.question,
+      message: message ?? "Select date",
+      default: initialiValue ? initialiValue.toDate() : dayjs().toDate(),
+      filter: (d: Date) => dayjs(d),
+      format: {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        weekday: "narrow",
+        timeZoneName: "short",
+        hour: undefined,
+        minute: undefined,
+      },
     },
   ]);
 
-  return menu;
+  return selection;
 };
 
-export const selectDataType = async (input?: DataType): Promise<DataType> => {
-  if (input) return input;
+export const selectAction = async (object?: ObjectType, input?: ActionType): Promise<ActionType> => {
+  const actions = {
+    messages: [
+      {
+        name: "📥 Message stock",
+        value: "messages-stock",
+      },
+      {
+        name: "🪟 Message view",
+        value: "messages-view",
+      },
+    ],
+    data: [
+      {
+        name: "🔄 Data fetch",
+        value: "data-fetch",
+      },
+      {
+        name: "🪟 Data view",
+        value: "data-view",
+      },
+    ],
+    teams: [
+      {
+        name: "➕ Team add",
+        value: "teams-add",
+      },
+      {
+        name: "➖ Team remove",
+        value: "teams-remove",
+      },
+    ],
+  };
 
   const { selection } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "selection",
-      prefix: COLOR.success("❓"),
+      prefix: icon.question,
       message: "What data do you want to do?",
-      choices: [
-        {
-          name: "💬 Message",
-          value: "message",
-        },
-        {
-          name: "👤 User",
-          value: "user",
-        },
-        {
-          name: "📺 Channel",
-          value: "channel",
-        },
-      ],
+      choices: object
+        ? actions[object]
+        : Object.values(actions).reduce((previous, current) => {
+            return previous.concat(current);
+          }, []),
     },
   ]);
 
@@ -96,7 +115,7 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
     {
       type: "list",
       name: "selection",
-      prefix: COLOR.success("❓"),
+      prefix: icon.question,
       message: "What output type do you want to do?",
       choices: [
         {
@@ -113,7 +132,7 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
         },
         {
           name: "  Excel",
-          value: "excel",
+          value: "xlsx",
         },
       ],
     },
@@ -135,7 +154,7 @@ export const selectTeam = async (input?: string): Promise<Team> => {
     if (team) {
       return team;
     } else {
-      console.log("you input invalid channel, please select next list");
+      cli.info(`${icon.warn} Got invalid team, please input next`);
     }
   }
 
@@ -143,8 +162,8 @@ export const selectTeam = async (input?: string): Promise<Team> => {
     {
       type: "list",
       name: "team",
-      prefix: COLOR.success("❓"),
-      message: "What data do you want to fetch?",
+      prefix: icon.question,
+      message: "Select team",
       choices: teams.map((team) => ({
         name: team.team_name,
         value: team,
@@ -155,7 +174,7 @@ export const selectTeam = async (input?: string): Promise<Team> => {
   return team;
 };
 
-export const selectChannel = async (input?: string): Promise<Channel> => {
+export const selectChannel = async (input?: string): Promise<Channel & Team> => {
   const channels = CONTROLLER.channels.find();
 
   if (channels.length === 0) {
@@ -168,7 +187,7 @@ export const selectChannel = async (input?: string): Promise<Channel> => {
     if (channel) {
       return channel;
     } else {
-      console.log("you input invalid channel, please select next list");
+      cli.info(`${icon.warn} Got invalid channel, please input next`);
     }
   }
 
@@ -176,46 +195,14 @@ export const selectChannel = async (input?: string): Promise<Channel> => {
     {
       type: "list",
       name: "channel",
-      prefix: COLOR.success("❓"),
+      prefix: icon.question,
       message: "What data do you want to fetch?",
       choices: channels.map((channel) => ({
-        name: channel.channel_name,
+        name: `${channel.team_name} #${color.bold(channel.channel_name)}`,
         value: channel,
       })),
     },
   ]);
 
   return channel;
-};
-
-export const selectDate = async (input?: Dayjs, message?: string, initialiValue?: Dayjs): Promise<Dayjs> => {
-  if (input) {
-    if (input.isValid()) {
-      return input;
-    } else {
-      console.log("you input invalid date, please input next");
-    }
-  }
-
-  const { selection } = await INTERACTIVE.prompt([
-    {
-      type: "date",
-      name: "selection",
-      prefix: COLOR.success("❓"),
-      message: message ?? "Select date",
-      default: initialiValue ? initialiValue.toDate() : dayjs().toDate(),
-      filter: (d: Date) => dayjs(d),
-      format: {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-        weekday: "narrow",
-        timeZoneName: "short",
-        hour: undefined,
-        minute: undefined,
-      },
-    },
-  ]);
-
-  return selection;
 };

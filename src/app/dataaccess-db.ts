@@ -130,132 +130,57 @@ export const DB_CLIENT = {
       );
     },
   },
-  messages: {
-    findMany({ channel_id, oldest, latest }: { channel_id: string; oldest: Dayjs; latest: Dayjs }): Message[] {
+  users: {
+    findMany(params: { team_id?: string } = {}): (User & Pick<Team, "team_id" | "team_name">)[] {
       return Array.from(
         db.queryIterate(
           `
           SELECT
-              message_id
-            , channel_id
-            , user_id
-            , ts
-            , type
-            , text
+              users.team_id
+            , teams.team_name
+            , users.user_id
+            , users.user_name
+            , users.is_admin
+            , users.is_owner
+            , users.is_primary_owner
+            , users.is_restricted
+            , users.is_ultra_restricted
+            , users.is_app_user
+            , users.is_bot
+            , users.deleted
           FROM
-            messages
+            users
+            LEFT OUTER JOIN teams
+              ON users.team_id = teams.team_id
+          ${
+            params.team_id
+              ? `
           WHERE
-            channel_id = @channel_id
-            AND ts BETWEEN @oldest AND @latest
-          `,
-          {
-            channel_id,
-            oldest: String(oldest.unix()),
-            latest: String(latest.unix()),
+            users.team_id = @team_id
+          `
+              : ""
           }
+          `,
+          params
         )
       );
     },
-    findUnique({
-      channel_id,
-      type,
-      user_id,
-      ts,
-    }: {
-      channel_id: string;
-      type: string;
-      user_id: string;
-      ts: string;
-    }): Message | undefined {
+    findUnique(user_id: string): (User & Pick<Team, "team_id" | "team_name">) | undefined {
       return db.queryFirstRow(
         `
           SELECT
-              message_id
-            , channel_id
-            , user_id
-            , ts
-            , type
-            , text
-          FROM
-            messages
-          WHERE
-            channel_id  = @channel_id
-            AND type    = @type
-            AND user_id = @user_id
-            AND ts      = @ts
-          `,
-        {
-          channel_id,
-          type,
-          user_id,
-          ts,
-        }
-      );
-    },
-    upsert(message: Prisma.MessageUncheckedCreateInput) {
-      return db.run(
-        `
-          INSERT INTO messages (
-              channel_id
-            , user_id
-            , ts
-            , type
-            , text
-          ) VALUES (
-              @channel_id
-            , @user_id
-            , @ts
-            , @type
-            , @text
-          ) ON CONFLICT (
-            channel_id, user_id, ts, type
-          ) DO UPDATE SET
-              channel_id  = @channel_id
-            , user_id     = @user_id
-            , ts          = @ts
-            , type        = @type
-            , text        = @text
-      `,
-        message
-      );
-    },
-  },
-  users: {
-    findMany(): User[] {
-      return Array.from(
-        db.queryIterate(`
-          SELECT
-            user_id
-            , team_id
-            , user_name
-            , is_admin
-            , is_owner
-            , is_primary_owner
-            , is_restricted
-            , is_ultra_restricted
-            , is_app_user
-            , is_bot
-            , deleted
-          FROM
-            users
-          `)
-      );
-    },
-    findUnique(user_id: string): User | undefined {
-      return db.queryFirstRow(
-        `
-          SELECT
-            user_id
-            , team_id
-            , user_name
-            , is_admin
-            , is_owner
-            , is_primary_owner
-            , is_restricted
-            , is_ultra_restricted
-            , is_app_user
-            , is_bot
-            , deleted
+              users.team_id
+            , teams.team_name
+            , users.user_id
+            , users.user_name
+            , users.is_admin
+            , users.is_owner
+            , users.is_primary_owner
+            , users.is_restricted
+            , users.is_ultra_restricted
+            , users.is_app_user
+            , users.is_bot
+            , users.deleted
           FROM
             users
           WHERE
@@ -312,51 +237,70 @@ export const DB_CLIENT = {
     },
   },
   channels: {
-    findMany(): Channel[] {
+    findMany(params: { team_id?: string } = {}): (Channel & Team)[] {
       return Array.from(
-        db.queryIterate(`
+        db.queryIterate(
+          `
           SELECT
-              channel_id
-            , team_id
-            , channel_name
-            , is_channel
-            , is_group
-            , is_im
-            , is_mpim
-            , is_private
-            , is_archived
-            , is_general
-            , is_shared
-            , is_org_shared
-            , is_pending_ext_shared
-            , is_ext_shared
+              channels.team_id
+            , teams.team_name
+            , channels.channel_id
+            , channels.channel_name
+            , teams.token
+            , channels.is_channel
+            , channels.is_group
+            , channels.is_im
+            , channels.is_mpim
+            , channels.is_private
+            , channels.is_archived
+            , channels.is_general
+            , channels.is_shared
+            , channels.is_org_shared
+            , channels.is_pending_ext_shared
+            , channels.is_ext_shared
           FROM
             channels
-          `)
+            LEFT OUTER JOIN teams
+              ON channels.team_id = teams.team_id
+          ${
+            params.team_id
+              ? `
+          WHERE
+            channels.team_id = @team_id
+          `
+              : ""
+          }
+          `,
+          params
+        )
       );
     },
-    findUnique(channel_id: string): Channel | undefined {
+    findUnique(channel_id: string): (Channel & Team) | undefined {
       return db.queryFirstRow(
         `
           SELECT
-              channel_id
-            , team_id
-            , channel_name
-            , is_channel
-            , is_group
-            , is_im
-            , is_mpim
-            , is_private
-            , is_archived
-            , is_general
-            , is_shared
-            , is_org_shared
-            , is_pending_ext_shared
-            , is_ext_shared
+              channels.team_id
+            , teams.team_name
+            , channels.channel_id
+            , channels.channel_name
+            , teams.token
+            , channels.is_channel
+            , channels.is_group
+            , channels.is_im
+            , channels.is_mpim
+            , channels.is_private
+            , channels.is_archived
+            , channels.is_general
+            , channels.is_shared
+            , channels.is_org_shared
+            , channels.is_pending_ext_shared
+            , channels.is_ext_shared
           FROM
             channels
+            LEFT OUTER JOIN teams
+              ON channels.team_id = teams.team_id
           WHERE
-            channel_id = @channel_id
+            channels.channel_id = @channel_id
           `,
         {
           channel_id,
@@ -414,6 +358,110 @@ export const DB_CLIENT = {
             , is_ext_shared         = @is_ext_shared
                 `,
         channel
+      );
+    },
+  },
+  messages: {
+    findMany(params: {
+      channel_id: string;
+      oldest: Dayjs;
+      latest: Dayjs;
+    }): (Message & Pick<Team, "team_name"> & Pick<Channel, "channel_name"> & Pick<User, "user_name">)[] {
+      return Array.from(
+        db.queryIterate(
+          `
+          SELECT
+              messages.team_id
+            , teams.team_name
+            , messages.channel_id
+            , channels.channel_name
+            , messages.user_id
+            , users.user_name
+            , messages.message_id
+            , messages.ts
+            , messages.type
+            , messages.text
+          FROM
+            messages
+            LEFT OUTER JOIN teams
+              ON messages.team_id = teams.team_id
+            LEFT OUTER JOIN channels
+              ON messages.channel_id = channels.channel_id
+            LEFT OUTER JOIN users
+              ON messages.user_id = users.user_id
+          WHERE
+            messages.channel_id = @channel_id
+            AND messages.ts BETWEEN @oldest AND @latest
+          `,
+          {
+            channel_id: params.channel_id,
+            oldest: String(params.oldest.unix()),
+            latest: String(params.latest.unix()),
+          }
+        )
+      );
+    },
+    findUnique(params: {
+      team_id: string;
+      channel_id: string;
+      type: string;
+      user_id: string;
+      ts: string;
+    }): (Message & Pick<Team, "team_name"> & Pick<Channel, "channel_name"> & Pick<User, "user_name">) | undefined {
+      return db.queryFirstRow(
+        `
+          SELECT
+              messages.team_id
+            , teams.team_name
+            , messages.channel_id
+            , channels.channel_name
+            , messages.user_id
+            , users.user_name
+            , messages.message_id
+            , ts
+            , type
+            , text
+          FROM
+            messages
+            LEFT OUTER JOIN teams
+              ON messages.team_id = teams.team_id
+            LEFT OUTER JOIN channels
+              ON messages.channel_id = channels.channel_id
+            LEFT OUTER JOIN users
+              ON messages.user_id = users.user_id
+          WHERE
+            team_id         = @team_id
+            AND channel_id  = @channel_id
+            AND type        = @type
+            AND user_id     = @user_id
+            AND ts          = @ts
+          `,
+        params
+      );
+    },
+    upsert(message: Prisma.MessageUncheckedCreateInput) {
+      return db.run(
+        `
+          INSERT INTO messages (
+              team_id
+            , channel_id
+            , user_id
+            , ts
+            , type
+            , text
+          ) VALUES (
+              @team_id
+            , @channel_id
+            , @user_id
+            , @ts
+            , @type
+            , @text
+          ) ON CONFLICT (
+            team_id, channel_id, user_id, ts, type
+          ) DO UPDATE SET
+            text = @text
+      `,
+        message
       );
     },
   },
