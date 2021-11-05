@@ -34,10 +34,10 @@ export default class Data extends Command {
 
     switch (args.action) {
       case "fetch":
-        await COMMANDS.data.fetch({ team: flags.team });
+        await COMMANDS.data.fetch({ team_name: flags.team });
         break;
       case "view":
-        await COMMANDS.data.view({ team: flags.team, output: flags.output as OutputType });
+        await COMMANDS.data.view({ team_name: flags.team, output: flags.output as OutputType });
         break;
       default:
         await COMMANDS.menu({ object: "data" }, flags);

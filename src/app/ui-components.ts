@@ -60,6 +60,7 @@ export const inputDate = async (input?: Dayjs, message?: string, initialiValue?:
 export const selectAction = async (object?: ObjectType, input?: ActionType): Promise<ActionType> => {
   const actions = {
     messages: [
+      new inquirer.Separator("== 💬 Messages ========================="),
       {
         name: "📥 Message stock",
         value: "messages-stock",
@@ -70,6 +71,7 @@ export const selectAction = async (object?: ObjectType, input?: ActionType): Pro
       },
     ],
     data: [
+      new inquirer.Separator("== 💽 Data (👤 Users & 📺 Channels) ===="),
       {
         name: "🔄 Data fetch",
         value: "data-fetch",
@@ -80,28 +82,32 @@ export const selectAction = async (object?: ObjectType, input?: ActionType): Pro
       },
     ],
     teams: [
+      new inquirer.Separator("== 👪 Teams ============================"),
       {
         name: "➕ Team add",
         value: "teams-add",
       },
       {
-        name: "➖ Team remove",
-        value: "teams-remove",
+        name: "🪟 Team view",
+        value: "teams-view",
       },
     ],
   };
+
+  const choices = object
+    ? actions[object]
+    : Object.values(actions).reduce((previous, current) => {
+        return previous.concat(current);
+      }, []);
 
   const { selection } = await INTERACTIVE.prompt([
     {
       type: "list",
       name: "selection",
       prefix: icon.question,
-      message: "What data do you want to do?",
-      choices: object
-        ? actions[object]
-        : Object.values(actions).reduce((previous, current) => {
-            return previous.concat(current);
-          }, []),
+      message: "What do you want to do?",
+      choices: choices,
+      pageSize: choices.length,
     },
   ]);
 
@@ -119,6 +125,10 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
       message: "What output type do you want to do?",
       choices: [
         {
+          name: "  Excel",
+          value: "xlsx",
+        },
+        {
           name: "🔲 Console",
           value: "console",
         },
@@ -129,10 +139,6 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
         {
           name: "📑 Tsv",
           value: "tsv",
-        },
-        {
-          name: "  Excel",
-          value: "xlsx",
         },
       ],
     },
@@ -145,7 +151,7 @@ export const selectTeam = async (input?: string): Promise<Team> => {
   const teams = CONTROLLER.teams.find();
 
   if (teams.length === 0) {
-    throw new Error("please first fetch channel");
+    throw new Error("please first fetch Team");
   }
 
   if (input) {
@@ -174,11 +180,11 @@ export const selectTeam = async (input?: string): Promise<Team> => {
   return team;
 };
 
-export const selectChannel = async (input?: string): Promise<Channel & Team> => {
-  const channels = CONTROLLER.channels.find();
+export const selectChannel = async (input?: string, team_id?: string): Promise<Channel & Team> => {
+  const channels = CONTROLLER.channels.find({ team_id });
 
   if (channels.length === 0) {
-    throw new Error("please first fetch channel");
+    throw new Error("please first fetch Data");
   }
 
   if (input) {
@@ -196,13 +202,27 @@ export const selectChannel = async (input?: string): Promise<Channel & Team> => 
       type: "list",
       name: "channel",
       prefix: icon.question,
-      message: "What data do you want to fetch?",
+      message: "Select channel",
       choices: channels.map((channel) => ({
-        name: `${channel.team_name} #${color.bold(channel.channel_name)}`,
+        name: `@${channel.team_name} ${channel.is_private ? "🔒" : "♯ "}${color.bold(channel.channel_name)}`,
         value: channel,
       })),
     },
   ]);
 
   return channel;
+};
+
+export const selectContinue = async (): Promise<boolean> => {
+  const { confirm } = await INTERACTIVE.prompt([
+    {
+      type: "confirm",
+      name: "confirm",
+      prefix: icon.question,
+      message: "continue?",
+      default: true,
+    },
+  ]);
+
+  return confirm;
 };

@@ -56,7 +56,7 @@ export default class Messages extends Command {
     const period = parsePeriod(flags.period, flags.month, flags.week, flags.day);
 
     switch (args.action) {
-      case "fetch":
+      case "stock":
         await COMMANDS.messages.stock({ channel: flags.channel, oldest: period.oldest, latest: period.latest });
         break;
       case "view":

@@ -19,18 +19,17 @@ export const icon = {
   warn: color.warn("⚠️ "),
   error: color.error("❌"),
   success: color.success("✔️ "),
-  done: color.success("☺️"),
-  tips: color.warn("💡"),
+  done: color.success("☺️ "),
   question: color.warn("❓"),
-  ok: color.success("🆗"),
+};
+
+export const message = {
+  progressing: `${icon.info} Progressing`,
+  success: `${icon.success} Success!`,
+  no_data: `${icon.error} No data`,
 };
 
 export const output = async (output: OutputType, data: any[], filePath: string, schema?: any[]) => {
-  if (data.length === 0) {
-    cli.info(`${icon.error} No data.`);
-    return;
-  }
-
   switch (output) {
     case "console":
       console.table(data);
@@ -39,7 +38,7 @@ export const output = async (output: OutputType, data: any[], filePath: string, 
     case "tsv":
       toXsv(output === "tsv" ? "\t" : ",", data, filePath);
       break;
-    case "excel":
+    case "xlsx":
       await toExcel(data, {
         schema: schema
           ? schema
@@ -58,7 +57,7 @@ export const output = async (output: OutputType, data: any[], filePath: string, 
       break;
   }
 
-  cli.info(`${icon.info} created "${filePath}", ${data.length.toLocaleString()} raws`);
+  cli.info(`${icon.info} created "${color.info(filePath)}", ${data.length.toLocaleString()} raws`);
 };
 
 const toXsv = (delimiter: string, data: any[], filePath: string) => {

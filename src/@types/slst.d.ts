@@ -1,6 +1,6 @@
 type ObjectType = "teams" | "data" | "messages";
 
-type ActionType = "teams-add" | "teams-remove" | "data-fetch" | "data-view" | "messages-stock" | "messages-view";
+type ActionType = "teams-add" | "teams-view" | "data-fetch" | "data-view" | "messages-stock" | "messages-view";
 
 type OutputType = "console" | "csv" | "tsv" | "xlsx";
 

@@ -6,7 +6,7 @@ import { decrypt, encrypt } from "./dataaccess-password";
 import { CONVERTER } from "./middleware-converter";
 
 export const CONTROLLER = {
-  team: {
+  teams: {
     async add(token: string) {
       const res = await CHAT_CLIENT.team.info(token);
       if (res.team == null) throw new Error("An unexpected error has occurred.");
@@ -16,8 +16,6 @@ export const CONTROLLER = {
 
       return team;
     },
-  },
-  teams: {
     find() {
       return DB_CLIENT.teams.findMany().map((team) => {
         team.token = decrypt(team.token);
@@ -32,7 +30,8 @@ export const CONTROLLER = {
 
       return res.members
         .map((member) => CONVERTER.user.convert(member))
-        .map((member) => DB_CLIENT.users.upsert(member));
+        .map((member) => DB_CLIENT.users.upsert(member))
+        .reduce((previous, current) => previous + current.changes, 0);
     },
     find(params: { team_id?: string } = {}) {
       return DB_CLIENT.users.findMany(params);
@@ -45,7 +44,8 @@ export const CONTROLLER = {
 
       return res.channels
         .map((channel) => CONVERTER.channel.convert({ ...channel, team_id }))
-        .map((channel) => DB_CLIENT.channels.upsert(channel));
+        .map((channel) => DB_CLIENT.channels.upsert(channel))
+        .reduce((previous, current) => previous + current.changes, 0);
     },
     find(params: { team_id?: string } = {}) {
       return DB_CLIENT.channels.findMany(params).map((channel) => {
@@ -67,7 +67,8 @@ export const CONTROLLER = {
 
       return res.messages
         .map((message) => CONVERTER.message.convert({ ...message, team_id, channel_id }))
-        .map((message) => DB_CLIENT.messages.upsert(message));
+        .map((message) => DB_CLIENT.messages.upsert(message))
+        .reduce((previous, current) => previous + current.changes, 0);
     },
     find(params: { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
       return DB_CLIENT.messages.findMany(params);

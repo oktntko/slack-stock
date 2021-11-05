@@ -12,6 +12,12 @@ export default class Teams extends Command {
       multiple: false,
       description: "user OAuth token installed your workspace",
     }),
+    output: flags.string({
+      char: "t",
+      description: "Select your output",
+      multiple: false,
+      options: ["console", "csv", "tsv", "xlsx"],
+    }),
   };
 
   static args = [
@@ -20,20 +26,19 @@ export default class Teams extends Command {
       description: "user OAuth token installed your workspace",
       required: false,
       hidden: false,
-      options: ["add", "remove"],
+      options: ["add", "view"],
     },
   ];
 
   async run() {
     const { args, flags } = this.parse(Teams);
-    console.log(args.action);
 
     switch (args.action) {
       case "add":
         await COMMANDS.teams.add({ token: flags.token });
         break;
-      case "remove":
-        await COMMANDS.teams.remove({ token: flags.token });
+      case "view":
+        await COMMANDS.teams.view({ output: flags.output as OutputType });
         break;
       default:
         await COMMANDS.menu({ object: "teams" }, flags);
