@@ -4,6 +4,7 @@ import { CHAT_CLIENT } from "./dataaccess-chat";
 import { DB_CLIENT } from "./dataaccess-db";
 import { decrypt, encrypt } from "./dataaccess-password";
 import { CONVERTER } from "./middleware-converter";
+import { color } from "./ui-helpers";
 
 export const CONTROLLER = {
   teams: {
@@ -16,7 +17,7 @@ export const CONTROLLER = {
 
       return team;
     },
-    find() {
+    async find() {
       return DB_CLIENT.teams.findMany().map((team) => {
         team.token = decrypt(team.token);
         return team;
@@ -33,7 +34,7 @@ export const CONTROLLER = {
         .map((member) => DB_CLIENT.users.upsert(member))
         .reduce((previous, current) => previous + current.changes, 0);
     },
-    find(params: { team_id?: string } = {}) {
+    async find(params: { team_id?: string } = {}) {
       return DB_CLIENT.users.findMany(params);
     },
   },
@@ -47,7 +48,7 @@ export const CONTROLLER = {
         .map((channel) => DB_CLIENT.channels.upsert(channel))
         .reduce((previous, current) => previous + current.changes, 0);
     },
-    find(params: { team_id?: string } = {}) {
+    async find(params: { team_id?: string } = {}) {
       return DB_CLIENT.channels.findMany(params).map((channel) => {
         channel.token = decrypt(channel.token);
         return channel;
@@ -67,11 +68,54 @@ export const CONTROLLER = {
 
       return res.messages
         .map((message) => CONVERTER.message.convert({ ...message, team_id, channel_id }))
-        .map((message) => DB_CLIENT.messages.upsert(message))
-        .reduce((previous, current) => previous + current.changes, 0);
+        .map((message) => {
+          const result = DB_CLIENT.messages.upsert(message);
+          if (!result) return null;
+
+          // VIRTUAL TABLE にインデックスが貼れないので存在チェックしてからデータ登録
+          const text = bigram(result.text);
+          const found = DB_CLIENT.messages.vFindUnique(result);
+          if (found?.message_id) {
+            DB_CLIENT.messages.vUpdate({ message_id: result.message_id, text });
+          } else {
+            DB_CLIENT.messages.vInsert({ message_id: result.message_id, text });
+          }
+
+          return result;
+        })
+        .filter((message) => message != null);
     },
-    find(params: { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
+    async find(params: { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
       return DB_CLIENT.messages.findMany(params);
     },
+    async search(params: { text?: string }) {
+      const text = bigram(params.text);
+      if (text) {
+        return DB_CLIENT.messages.vFindMany({ text }).map((message) => ({
+          name: `${message.team_name} ${message.channel_name} ${color.bold(message.text)}`,
+          value: message,
+        }));
+      } else {
+        return [];
+      }
+    },
   },
+};
+
+const bigram = (text?: string) => {
+  if (!text) {
+    return "";
+  }
+
+  const str = text.replace(/\s+/g, "");
+  if (str.length <= 2) {
+    return str;
+  }
+
+  const grams = [];
+  for (let i = 0; i <= str.length - 2; i++) {
+    grams.push(str.substr(i, 2).toLowerCase());
+  }
+
+  return grams.join(" ");
 };

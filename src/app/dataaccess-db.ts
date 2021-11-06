@@ -71,6 +71,12 @@ CREATE TABLE IF NOT EXISTS "messages" (
     CONSTRAINT "messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
+-- CreateTable
+CREATE VIRTUAL TABLE IF NOT EXISTS "v_messages" USING fts5(
+    "message_id",
+    "text"
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX IF NOT EXISTS "messages_team_id_channel_id_user_id_ts_type_key" ON "messages"("team_id", "channel_id", "user_id", "ts", "type");
 
@@ -401,6 +407,46 @@ export const DB_CLIENT = {
         )
       );
     },
+    vFindMany(params: {
+      text: string;
+    }): (Message &
+      Pick<Team, "team_name"> &
+      Pick<Channel, "channel_name"> &
+      Pick<User, "user_name"> & { rank: number })[] {
+      return Array.from(
+        db.queryIterate(
+          `
+          SELECT
+              rank
+            , messages.team_id
+            , teams.team_name
+            , messages.channel_id
+            , channels.channel_name
+            , messages.user_id
+            , users.user_name
+            , messages.message_id
+            , messages.ts
+            , messages.type
+            , messages.text
+          FROM
+            v_messages
+            INNER JOIN messages
+              ON v_messages.message_id = messages.message_id
+            LEFT OUTER JOIN teams
+              ON messages.team_id = teams.team_id
+            LEFT OUTER JOIN channels
+              ON messages.channel_id = channels.channel_id
+            LEFT OUTER JOIN users
+              ON messages.user_id = users.user_id
+          WHERE
+            v_messages.text MATCH @text
+          ORDER BY
+            rank ASC
+          `,
+          params
+        )
+      );
+    },
     findUnique(params: {
       team_id: string;
       channel_id: string;
@@ -418,9 +464,9 @@ export const DB_CLIENT = {
             , messages.user_id
             , users.user_name
             , messages.message_id
-            , ts
-            , type
-            , text
+            , messages.ts
+            , messages.type
+            , messages.text
           FROM
             messages
             LEFT OUTER JOIN teams
@@ -432,15 +478,30 @@ export const DB_CLIENT = {
           WHERE
             team_id         = @team_id
             AND channel_id  = @channel_id
-            AND type        = @type
             AND user_id     = @user_id
             AND ts          = @ts
+            AND type        = @type
           `,
         params
       );
     },
-    upsert(message: Prisma.MessageUncheckedCreateInput) {
-      return db.run(
+    vFindUnique(params: { message_id: number }): Pick<Message, "message_id"> | undefined {
+      return db.queryFirstRow(
+        `
+          SELECT
+            message_id
+          FROM
+            v_messages
+          WHERE
+            message_id = @message_id
+      `,
+        {
+          message_id: String(params.message_id),
+        }
+      );
+    },
+    upsert(message: Prisma.MessageUncheckedCreateInput): Message | undefined {
+      return db.queryFirstRow(
         `
           INSERT INTO messages (
               team_id
@@ -460,8 +521,39 @@ export const DB_CLIENT = {
             team_id, channel_id, user_id, ts, type
           ) DO UPDATE SET
             text = @text
+          RETURNING *
       `,
         message
+      );
+    },
+    vUpdate(params: { message_id: number; text: string }) {
+      return db.run(
+        `
+          UPDATE v_messages
+          SET text = @text
+          WHERE message_id = @message_id
+      `,
+        {
+          message_id: String(params.message_id),
+          text: params.text,
+        }
+      );
+    },
+    vInsert(params: { message_id: number; text: string }) {
+      return db.run(
+        `
+          INSERT INTO v_messages (
+              message_id
+            , text
+          ) VALUES (
+              @message_id
+            , @text
+          )
+      `,
+        {
+          message_id: String(params.message_id),
+          text: params.text,
+        }
       );
     },
   },

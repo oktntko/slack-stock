@@ -46,7 +46,7 @@ export default class Messages extends Command {
       name: "action",
       required: false,
       hidden: false,
-      options: ["stock", "view"],
+      options: ["stock", "view", "search"],
     },
   ];
 
@@ -66,6 +66,9 @@ export default class Messages extends Command {
           latest: period.latest,
           output: flags.output as OutputType,
         });
+        break;
+      case "search":
+        await COMMANDS.messages.search();
         break;
       default:
         await COMMANDS.menu(

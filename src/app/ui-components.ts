@@ -69,6 +69,10 @@ export const selectAction = async (object?: ObjectType, input?: ActionType): Pro
         name: "🪟 Message view",
         value: "messages-view",
       },
+      {
+        name: "🔍 Message search",
+        value: "messages-search",
+      },
     ],
     data: [
       new inquirer.Separator("== 💽 Data (👤 Users & 📺 Channels) ===="),
@@ -148,7 +152,7 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
 };
 
 export const selectTeam = async (input?: string): Promise<Team> => {
-  const teams = CONTROLLER.teams.find();
+  const teams = await CONTROLLER.teams.find();
 
   if (teams.length === 0) {
     throw new Error("please first fetch Team");
@@ -180,8 +184,8 @@ export const selectTeam = async (input?: string): Promise<Team> => {
   return team;
 };
 
-export const selectChannel = async (input?: string, team_id?: string): Promise<Channel & Team> => {
-  const channels = CONTROLLER.channels.find({ team_id });
+export const selectChannels = async (input?: string, team_id?: string): Promise<(Channel & Team)[]> => {
+  const channels = await CONTROLLER.channels.find({ team_id });
 
   if (channels.length === 0) {
     throw new Error("please first fetch Data");
@@ -191,7 +195,7 @@ export const selectChannel = async (input?: string, team_id?: string): Promise<C
     const channel = channels.find((channel) => channel.channel_id === input || channel.channel_name === input);
 
     if (channel) {
-      return channel;
+      return [channel];
     } else {
       cli.info(`${icon.warn} Got invalid channel, please input next`);
     }
@@ -199,7 +203,7 @@ export const selectChannel = async (input?: string, team_id?: string): Promise<C
 
   const { channel } = await INTERACTIVE.prompt([
     {
-      type: "list",
+      type: "checkbox",
       name: "channel",
       prefix: icon.question,
       message: "Select channel",
@@ -211,6 +215,23 @@ export const selectChannel = async (input?: string, team_id?: string): Promise<C
   ]);
 
   return channel;
+};
+
+export const selectMessage = async (input?: string): Promise<string> => {
+  if (input) return input;
+
+  const { message } = await INTERACTIVE.prompt([
+    {
+      type: "autocomplete",
+      name: "keyword",
+      message: "Input keyword",
+      source(_: any, input: string) {
+        return CONTROLLER.messages.search({ text: input });
+      },
+    },
+  ]);
+
+  return message;
 };
 
 export const selectContinue = async (): Promise<boolean> => {

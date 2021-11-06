@@ -8,8 +8,9 @@ import {
   inputDate,
   inputToken,
   selectAction,
-  selectChannel,
+  selectChannels,
   selectContinue,
+  selectMessage,
   selectOutputType,
   selectTeam,
 } from "./ui-components";
@@ -74,12 +75,8 @@ export const COMMANDS = {
 
       if (users.length > 0 && channels.length > 0) {
         await Promise.all([
-          output(outputType, users, filePath(`@${team.team_name}_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`)),
-          output(
-            outputType,
-            channels,
-            filePath(`@${team.team_name}_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`)
-          ),
+          output(outputType, users, filePath(`@slst_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`)),
+          output(outputType, channels, filePath(`@slst_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`)),
         ]);
 
         cli.action.stop(message.success);
@@ -109,11 +106,7 @@ export const COMMANDS = {
       const users = await CONTROLLER.users.find(team);
 
       if (users.length > 0) {
-        await output(
-          outputType,
-          users,
-          filePath(`@${team.team_name}_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`)
-        );
+        await output(outputType, users, filePath(`@slst_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`));
 
         cli.action.stop(message.success);
       } else {
@@ -142,11 +135,7 @@ export const COMMANDS = {
       const channels = await CONTROLLER.channels.find(team);
 
       if (channels.length > 0) {
-        await output(
-          outputType,
-          channels,
-          filePath(`@${team.team_name}_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`)
-        );
+        await output(outputType, channels, filePath(`@slst_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`));
 
         cli.action.stop(message.success);
       } else {
@@ -156,20 +145,26 @@ export const COMMANDS = {
   },
   messages: {
     async stock(options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs } = {}) {
-      const channel = await selectChannel(options.channel, options.team_id);
+      const channels = await selectChannels(options.channel, options.team_id);
       const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
       const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
 
       cli.action.start(message.progressing);
-      const result = await CONTROLLER.messages.fetch({
-        team_id: channel.team_id,
-        token: channel.token,
-        channel_id: channel.channel_id,
-        oldest,
-        latest,
-      });
+      const result = (
+        await Promise.all(
+          channels.map((channel) =>
+            CONTROLLER.messages.fetch({
+              team_id: channel.team_id,
+              token: channel.token,
+              channel_id: channel.channel_id,
+              oldest,
+              latest,
+            })
+          )
+        )
+      ).flat();
 
-      if (result > 0) {
+      if (result.length > 0) {
         cli.action.stop(message.success);
       } else {
         cli.action.stop(message.no_data);
@@ -178,33 +173,38 @@ export const COMMANDS = {
     async view(
       options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs; output?: OutputType } = {}
     ) {
-      const channel = await selectChannel(options.channel, options.team_id);
+      const channels = await selectChannels(options.channel, options.team_id);
       const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
       const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
       const outputType = await selectOutputType(options.output);
 
       cli.action.start(message.progressing);
-      const messages = await CONTROLLER.messages.find({
-        channel_id: channel.channel_id,
-        oldest,
-        latest,
-      });
+      const messages = (
+        await Promise.all(
+          channels.map((channel) =>
+            CONTROLLER.messages.find({
+              channel_id: channel.channel_id,
+              oldest,
+              latest,
+            })
+          )
+        )
+      ).flat();
 
       if (messages.length > 0) {
         await output(
           outputType,
           messages,
-          filePath(
-            `@${channel.team_name}_#${channel.channel_name}_messages_${oldest.format("YYYY-MM-DD")}〜${latest.format(
-              "YYYY-MM-DD"
-            )}.${outputType}`
-          )
+          filePath(`@slst_messages_${oldest.format("YYYY-MM-DD")}〜${latest.format("YYYY-MM-DD")}.${outputType}`)
         );
 
         cli.action.stop(message.success);
       } else {
         cli.action.stop(message.no_data);
       }
+    },
+    async search() {
+      const message = await selectMessage();
     },
   },
   async menu(args: { object?: ObjectType; action?: ActionType } = {}, options: any = {}) {
@@ -229,6 +229,9 @@ export const COMMANDS = {
           break;
         case "messages-view":
           await COMMANDS.messages.view(options);
+          break;
+        case "messages-search":
+          await COMMANDS.messages.search();
           break;
       }
 
