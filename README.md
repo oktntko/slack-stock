@@ -172,7 +172,7 @@ ALIASES
   $ slst d
 ```
 
-_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/data.ts)_
+_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.0.2/src/commands/data.ts)_
 
 ## `slst help [COMMAND]`
 
@@ -206,7 +206,7 @@ ALIASES
   $ slst
 ```
 
-_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/menu.ts)_
+_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.0.2/src/commands/menu.ts)_
 
 ## `slst messages [ACTION]`
 
@@ -231,7 +231,7 @@ ALIASES
   $ slst message
 ```
 
-_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/messages.ts)_
+_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.0.2/src/commands/messages.ts)_
 
 ## `slst teams [ACTION]`
 
@@ -254,7 +254,7 @@ ALIASES
   $ slst team
 ```
 
-_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/teams.ts)_
+_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.0.2/src/commands/teams.ts)_
 <!-- commandsstop -->
 
 # Program Resources
