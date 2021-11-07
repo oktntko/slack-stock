@@ -92,8 +92,11 @@ If you are the workspace owner, your options will automatically appear.
 
 Add OAuth Scopes, slack-stock needs below scopes.
 
-- channels:read
 - channels:history
+- channels:read
+- groups:history
+- groups:read
+- team:read
 - users:read
 
 <center>
@@ -148,39 +151,95 @@ video
 
 <!-- commands -->
 
-- [`slst add [FILE]`](#slst-add-file)
-- [`slst contact`](#slst-contact)
+- [`slst menu`](#slst-menu)
+- [`slst teams [ACTION]`](#slst-teams-action)
+- [`slst data [ACTION]`](#slst-data-action)
+- [`slst messages [ACTION]`](#slst-messages-action)
 - [`slst help [COMMAND]`](#slst-help-command)
-- [`slst new-team [FILE]`](#slst-new-team-file)
-- [`slst stock [DATA]`](#slst-stock-data)
-- [`slst view [DATA] [OUTPUT]`](#slst-view-data-output)
 
-## `slst add [FILE]`
+## `slst menu`
 
-describe the command here
+Select menu
 
 ```
 USAGE
-  $ slst add [FILE]
+  $ slst menu
 
 OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
+  -h, --help  show CLI help
+
+ALIASES
+  $ slst
 ```
 
-_See code: [src/commands/add.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/add.ts)_
+_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/menu.ts)_
 
-## `slst contact`
+## `slst teams [ACTION]`
 
-Contact support
+You can add & view team
 
 ```
 USAGE
-  $ slst contact
+  $ slst teams [ACTION]
+
+ARGUMENTS
+  ACTION  (add|view) OAuth token installed your workspace
+
+OPTIONS
+  -h, --help                         show CLI help
+  -t, --output=console|csv|tsv|xlsx  Select output format
+  -t, --token=token                  OAuth token installed your workspace
+
+ALIASES
+  $ slst t
+  $ slst team
 ```
 
-_See code: [src/commands/contact.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/contact.ts)_
+_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/teams.ts)_
+
+## `slst data [ACTION]`
+
+You can fetch & view data(user & channel)
+
+```
+USAGE
+  $ slst data [ACTION]
+
+OPTIONS
+  -h, --help                         show CLI help
+  -o, --output=console|csv|tsv|xlsx  Select output format
+  -t, --team=team                    Enter team name
+
+ALIASES
+  $ slst d
+```
+
+_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/data.ts)_
+
+## `slst messages [ACTION]`
+
+You can stock & view message
+
+```
+USAGE
+  $ slst messages [ACTION]
+
+OPTIONS
+  -c, --channel=channel              Enter channel name
+  -d, --day                          If this flag ON, period is from one day ago to now.
+  -h, --help                         show CLI help
+  -k, --keyword=keyword              Enter timer keyword. ex) --keyword="start" "stop"
+  -m, --month                        If this flag ON, period is from one month ago to now.
+  -o, --output=console|csv|tsv|xlsx  Select output format
+  -p, --period=period                Enter period. ex) --period="YYYY-MM-DD" "YYYY-MM-DD"
+  -w, --week                         If this flag ON, period is from one week ago to now.
+
+ALIASES
+  $ slst m
+  $ slst message
+```
+
+_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/messages.ts)_
 
 ## `slst help [COMMAND]`
 
@@ -198,64 +257,6 @@ OPTIONS
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
-
-## `slst new-team [FILE]`
-
-describe the command here
-
-```
-USAGE
-  $ slst new-team [FILE]
-
-OPTIONS
-  -f, --force
-  -h, --help       show CLI help
-  -n, --name=name  name to print
-```
-
-_See code: [src/commands/new-team.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/new-team.ts)_
-
-## `slst stock [DATA]`
-
-Stock data
-
-```
-USAGE
-  $ slst stock [DATA]
-
-ARGUMENTS
-  DATA  (message|user|channel) select fetch data
-
-OPTIONS
-  -c, --channel=channel  if fetch message data, set channel name or channel id
-  -f, --from=from        if fetch message data, set from date, format=yyyy-MM-dd
-  -h, --help             show CLI help
-  -n, --name=name        slack name from config file
-  -t, --to=to            if fetch message data, set to date, format=yyyy-MM-dd
-```
-
-_See code: [src/commands/stock.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/stock.ts)_
-
-## `slst view [DATA] [OUTPUT]`
-
-View data
-
-```
-USAGE
-  $ slst view [DATA] [OUTPUT]
-
-ARGUMENTS
-  DATA    (message|user|channel) select output data
-  OUTPUT  (console|csv|tsv|excel) select output type
-
-OPTIONS
-  -c, --channel=channel  if fetch message data, set channel name or channel id
-  -f, --from=from        if fetch message data, set from date, format=yyyy-MM-dd
-  -h, --help             show CLI help
-  -t, --to=to            if fetch message data, set to date, format=yyyy-MM-dd
-```
-
-_See code: [src/commands/view.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/view.ts)_
 
 <!-- commandsstop -->
 
