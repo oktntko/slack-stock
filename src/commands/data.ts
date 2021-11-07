@@ -3,18 +3,18 @@ import { COMMANDS } from "../app/ui-commands";
 
 export default class Data extends Command {
   static aliases = ["d"];
-  static description = "describe the command here";
+  static description = "You can fetch & view data(user & channel)";
 
   static flags = {
     help: flags.help({ char: "h" }),
     team: flags.string({
       char: "t",
       multiple: false,
-      description: "Select your team",
+      description: "Enter team name",
     }),
     output: flags.string({
-      char: "t",
-      description: "Select your output",
+      char: "o",
+      description: "Select output format",
       multiple: false,
       options: ["console", "csv", "tsv", "xlsx"],
     }),

@@ -3,18 +3,18 @@ import { COMMANDS } from "../app/ui-commands";
 
 export default class Teams extends Command {
   static aliases = ["t", "team"];
-  static description = "describe the command here";
+  static description = "You can add & view team";
 
   static flags = {
     help: flags.help({ char: "h" }),
     token: flags.string({
       char: "t",
       multiple: false,
-      description: "user OAuth token installed your workspace",
+      description: "OAuth token installed your workspace",
     }),
     output: flags.string({
       char: "t",
-      description: "Select your output",
+      description: "Select output format",
       multiple: false,
       options: ["console", "csv", "tsv", "xlsx"],
     }),
@@ -23,7 +23,7 @@ export default class Teams extends Command {
   static args = [
     {
       name: "action",
-      description: "user OAuth token installed your workspace",
+      description: "OAuth token installed your workspace",
       required: false,
       hidden: false,
       options: ["add", "view"],

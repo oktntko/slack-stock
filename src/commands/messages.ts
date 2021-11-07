@@ -4,45 +4,45 @@ import { COMMANDS } from "../app/ui-commands";
 
 export default class Messages extends Command {
   static aliases = ["m", "message"];
-  static description = "describe the command here";
+  static description = "You can stock & view message";
 
   static flags = {
     help: flags.help({ char: "h" }),
     channel: flags.string({
       char: "c",
-      description: "if stock message data, set channel name or channel id",
+      description: "Enter channel name",
     }),
     period: flags.string({
       char: "p",
       multiple: true,
       exclusive: ["month", "week", "day"],
-      description: "if stock message data, set from date, format=yyyy-MM-dd",
+      description: `Enter period. ex) --period="YYYY-MM-DD" "YYYY-MM-DD"`,
     }),
     month: flags.boolean({
       char: "m",
       exclusive: ["period", "week", "day"],
-      description: "if stock message data, set to date, format=yyyy-MM-dd",
+      description: "If this flag ON, period is from one month ago to now.",
     }),
     week: flags.boolean({
       char: "w",
       exclusive: ["period", "month", "day"],
-      description: "if stock message data, set to date, format=yyyy-MM-dd",
+      description: "If this flag ON, period is from one week ago to now.",
     }),
     day: flags.boolean({
       char: "d",
       exclusive: ["period", "week", "month"],
-      description: "if stock message data, set to date, format=yyyy-MM-dd",
+      description: "If this flag ON, period is from one day ago to now.",
     }),
     output: flags.string({
-      char: "t",
-      description: "Select your output",
+      char: "o",
+      description: "Select output format",
       multiple: false,
       options: ["console", "csv", "tsv", "xlsx"],
     }),
     keyword: flags.string({
       char: "k",
       multiple: true,
-      description: "if stock message data, set from date, format=yyyy-MM-dd",
+      description: `Enter timer keyword. ex) --keyword="start" "stop"`,
     }),
   };
 
