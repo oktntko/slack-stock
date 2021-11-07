@@ -6,14 +6,13 @@
 [![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/cli/slack-stock/blob/master/package.json)
 
 <!-- toc -->
-
-- [slack-stock](#slack-stock)
-- [About](#about)
-- [Introduction](#introduction)
-- [Installation](#installation)
-- [add](#add)
-- [Commands](#commands)
-- [Program Resources](#program-resources)
+* [slack-stock](#slack-stock)
+* [About](#about)
+* [Introduction](#introduction)
+* [Installation](#installation)
+* [add](#add)
+* [Commands](#commands)
+* [Program Resources](#program-resources)
 <!-- tocstop -->
 
 # About
@@ -150,52 +149,11 @@ video
 # Commands
 
 <!-- commands -->
-
-- [`slst menu`](#slst-menu)
-- [`slst teams [ACTION]`](#slst-teams-action)
-- [`slst data [ACTION]`](#slst-data-action)
-- [`slst messages [ACTION]`](#slst-messages-action)
-- [`slst help [COMMAND]`](#slst-help-command)
-
-## `slst menu`
-
-Select menu
-
-```
-USAGE
-  $ slst menu
-
-OPTIONS
-  -h, --help  show CLI help
-
-ALIASES
-  $ slst
-```
-
-_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/menu.ts)_
-
-## `slst teams [ACTION]`
-
-You can add & view team
-
-```
-USAGE
-  $ slst teams [ACTION]
-
-ARGUMENTS
-  ACTION  (add|view) OAuth token installed your workspace
-
-OPTIONS
-  -h, --help                         show CLI help
-  -t, --output=console|csv|tsv|xlsx  Select output format
-  -t, --token=token                  OAuth token installed your workspace
-
-ALIASES
-  $ slst t
-  $ slst team
-```
-
-_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/teams.ts)_
+* [`slst data [ACTION]`](#slst-data-action)
+* [`slst help [COMMAND]`](#slst-help-command)
+* [`slst menu`](#slst-menu)
+* [`slst messages [ACTION]`](#slst-messages-action)
+* [`slst teams [ACTION]`](#slst-teams-action)
 
 ## `slst data [ACTION]`
 
@@ -214,7 +172,41 @@ ALIASES
   $ slst d
 ```
 
-_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/data.ts)_
+_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/data.ts)_
+
+## `slst help [COMMAND]`
+
+display help for slst
+
+```
+USAGE
+  $ slst help [COMMAND]
+
+ARGUMENTS
+  COMMAND  command to show help for
+
+OPTIONS
+  --all  see all commands in CLI
+```
+
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
+
+## `slst menu`
+
+Select menu
+
+```
+USAGE
+  $ slst menu
+
+OPTIONS
+  -h, --help  show CLI help
+
+ALIASES
+  $ slst
+```
+
+_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/menu.ts)_
 
 ## `slst messages [ACTION]`
 
@@ -239,25 +231,30 @@ ALIASES
   $ slst message
 ```
 
-_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.0.0/src/commands/messages.ts)_
+_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/messages.ts)_
 
-## `slst help [COMMAND]`
+## `slst teams [ACTION]`
 
-display help for slst
+You can add & view team
 
 ```
 USAGE
-  $ slst help [COMMAND]
+  $ slst teams [ACTION]
 
 ARGUMENTS
-  COMMAND  command to show help for
+  ACTION  (add|view) OAuth token installed your workspace
 
 OPTIONS
-  --all  see all commands in CLI
+  -h, --help                         show CLI help
+  -t, --output=console|csv|tsv|xlsx  Select output format
+  -t, --token=token                  OAuth token installed your workspace
+
+ALIASES
+  $ slst t
+  $ slst team
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
-
+_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.0.1/src/commands/teams.ts)_
 <!-- commandsstop -->
 
 # Program Resources

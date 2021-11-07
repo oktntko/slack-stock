@@ -1,6 +1,6 @@
 {
   "name": "slack-stock",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "bin": {
     "slst": "./bin/run"
   },
