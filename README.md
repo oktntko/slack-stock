@@ -3,16 +3,17 @@
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/slack-stock.svg)](https://npmjs.org/package/slack-stock)
 [![Downloads/week](https://img.shields.io/npm/dw/slack-stock.svg)](https://npmjs.org/package/slack-stock)
-[![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/cli/slack-stock/blob/master/package.json)
+[![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/oktntko/slack-stock/blob/master/package.json)
 
 <!-- toc -->
-* [slack-stock](#slack-stock)
-* [About](#about)
-* [Introduction](#introduction)
-* [Installation](#installation)
-* [add](#add)
-* [Commands](#commands)
-* [Program Resources](#program-resources)
+
+- [slack-stock](#slack-stock)
+- [About](#about)
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [add](#add)
+- [Commands](#commands)
+- [Program Resources](#program-resources)
 <!-- tocstop -->
 
 # About
@@ -149,11 +150,12 @@ video
 # Commands
 
 <!-- commands -->
-* [`slst data [ACTION]`](#slst-data-action)
-* [`slst help [COMMAND]`](#slst-help-command)
-* [`slst menu`](#slst-menu)
-* [`slst messages [ACTION]`](#slst-messages-action)
-* [`slst teams [ACTION]`](#slst-teams-action)
+
+- [`slst data [ACTION]`](#slst-data-action)
+- [`slst help [COMMAND]`](#slst-help-command)
+- [`slst menu`](#slst-menu)
+- [`slst messages [ACTION]`](#slst-messages-action)
+- [`slst teams [ACTION]`](#slst-teams-action)
 
 ## `slst data [ACTION]`
 
@@ -172,7 +174,7 @@ ALIASES
   $ slst d
 ```
 
-_See code: [src/commands/data.ts](https://github.com/cli/slack-stock/blob/v0.1.0/src/commands/data.ts)_
+_See code: [src/commands/data.ts](https://github.com/oktntko/slack-stock/blob/v0.1.0/src/commands/data.ts)_
 
 ## `slst help [COMMAND]`
 
@@ -206,7 +208,7 @@ ALIASES
   $ slst
 ```
 
-_See code: [src/commands/menu.ts](https://github.com/cli/slack-stock/blob/v0.1.0/src/commands/menu.ts)_
+_See code: [src/commands/menu.ts](https://github.com/oktntko/slack-stock/blob/v0.1.0/src/commands/menu.ts)_
 
 ## `slst messages [ACTION]`
 
@@ -231,7 +233,7 @@ ALIASES
   $ slst message
 ```
 
-_See code: [src/commands/messages.ts](https://github.com/cli/slack-stock/blob/v0.1.0/src/commands/messages.ts)_
+_See code: [src/commands/messages.ts](https://github.com/oktntko/slack-stock/blob/v0.1.0/src/commands/messages.ts)_
 
 ## `slst teams [ACTION]`
 
@@ -254,7 +256,8 @@ ALIASES
   $ slst team
 ```
 
-_See code: [src/commands/teams.ts](https://github.com/cli/slack-stock/blob/v0.1.0/src/commands/teams.ts)_
+_See code: [src/commands/teams.ts](https://github.com/oktntko/slack-stock/blob/v0.1.0/src/commands/teams.ts)_
+
 <!-- commandsstop -->
 
 # Program Resources

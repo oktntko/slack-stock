@@ -4,7 +4,7 @@
   "bin": {
     "slst": "./bin/run"
   },
-  "bugs": "https://github.com/cli/slack-stock/issues",
+  "bugs": "https://github.com/oktntko/slack-stock/issues",
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
     "@oclif/test": "^1.2.8",
@@ -37,7 +37,7 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "homepage": "https://github.com/cli/slack-stock",
+  "homepage": "https://github.com/oktntko/slack-stock",
   "keywords": [
     "oclif"
   ],
@@ -50,7 +50,7 @@
       "@oclif/plugin-help"
     ]
   },
-  "repository": "cli/slack-stock",
+  "repository": "oktntko/slack-stock",
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
