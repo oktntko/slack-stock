@@ -89,15 +89,32 @@ export const CONTROLLER = {
       return DB_CLIENT.messages.findMany(params);
     },
     async search(params: { text?: string }) {
-      const text = bigram(params.text);
+      const text = params.text
+        ? params.text
+            .split(/\s+/g)
+            .map((input) => bigram(input))
+            .join(" ")
+        : "";
+
       if (text) {
         return DB_CLIENT.messages.vFindMany({ text }).map((message) => ({
-          name: `${message.team_name} ${message.channel_name} ${color.bold(message.text)}`,
+          name: `${message.team_name} | ${message.channel_name} | ${message.user_name} | ${
+            message.time_tz
+          } | ${color.bold(message.text.replaceAll("\n", color.dim("↓ ")))}`,
           value: message,
         }));
       } else {
         return [];
       }
+    },
+    async timer(params: {
+      channel_id: string;
+      oldest: Dayjs;
+      latest: Dayjs;
+      startKeyword: string;
+      endKeyword: string;
+    }) {
+      return DB_CLIENT.messages.vFindManyTimer(params);
     },
   },
 };

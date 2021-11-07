@@ -6,6 +6,7 @@ import path from "path";
 import { CONTROLLER } from "./middleware-controller";
 import {
   inputDate,
+  inputKeyword,
   inputToken,
   selectAction,
   selectChannels,
@@ -203,8 +204,45 @@ export const COMMANDS = {
         cli.action.stop(message.no_data);
       }
     },
+    async timer(
+      options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs; output?: OutputType } = {}
+    ) {
+      const channels = await selectChannels(options.channel, options.team_id);
+      const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
+      const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
+      const startKeyword = await inputKeyword("開始", "Enter start keyword");
+      const endKeyword = await inputKeyword("終了", "Enter end   keyword");
+      const outputType = await selectOutputType(options.output);
+
+      cli.action.start(message.progressing);
+      const messages = (
+        await Promise.all(
+          channels.map((channel) =>
+            CONTROLLER.messages.timer({
+              channel_id: channel.channel_id,
+              oldest,
+              latest,
+              startKeyword,
+              endKeyword,
+            })
+          )
+        )
+      ).flat();
+
+      if (messages.length > 0) {
+        await output(
+          outputType,
+          messages,
+          filePath(`@slst_messages_timer_${oldest.format("YYYY-MM-DD")}〜${latest.format("YYYY-MM-DD")}.${outputType}`)
+        );
+
+        cli.action.stop(message.success);
+      } else {
+        cli.action.stop(message.no_data);
+      }
+    },
     async search() {
-      const message = await selectMessage();
+      const _ = await selectMessage();
     },
   },
   async menu(args: { object?: ObjectType; action?: ActionType } = {}, options: any = {}) {
@@ -232,6 +270,9 @@ export const COMMANDS = {
           break;
         case "messages-search":
           await COMMANDS.messages.search();
+          break;
+        case "messages-timer":
+          await COMMANDS.messages.timer();
           break;
       }
 

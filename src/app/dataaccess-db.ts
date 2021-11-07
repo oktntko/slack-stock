@@ -64,6 +64,8 @@ CREATE TABLE IF NOT EXISTS "messages" (
     "channel_id" TEXT NOT NULL,
     "user_id" TEXT NOT NULL,
     "ts" TEXT NOT NULL,
+    "date_tz" TEXT NOT NULL,
+    "time_tz" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "text" TEXT NOT NULL,
     CONSTRAINT "messages_team_id_fkey" FOREIGN KEY ("team_id") REFERENCES "teams" ("team_id") ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -385,6 +387,8 @@ export const DB_CLIENT = {
             , users.user_name
             , messages.message_id
             , messages.ts
+            , messages.date_tz
+            , messages.time_tz
             , messages.type
             , messages.text
           FROM
@@ -426,6 +430,8 @@ export const DB_CLIENT = {
             , users.user_name
             , messages.message_id
             , messages.ts
+            , messages.date_tz
+            , messages.time_tz
             , messages.type
             , messages.text
           FROM
@@ -447,6 +453,127 @@ export const DB_CLIENT = {
         )
       );
     },
+    vFindManyTimer(params: {
+      channel_id: string;
+      oldest: Dayjs;
+      latest: Dayjs;
+      startKeyword: string;
+      endKeyword: string;
+    }): (Pick<Team, "team_id" | "team_name"> &
+      Pick<Channel, "channel_id" | "channel_name"> &
+      Pick<User, "user_id" | "user_name"> &
+      Pick<Message, "date_tz"> & {
+        start_ts: string;
+        start_time_tz: string;
+        start_type: string;
+        start_text: string;
+        end_ts: string;
+        end_time_tz: string;
+        end_type: string;
+        end_text: string;
+      })[] {
+      return Array.from(
+        db.queryIterate(
+          `
+          SELECT
+            -- common
+              START_KEYWORD.team_id
+            , teams.team_name
+            , START_KEYWORD.channel_id
+            , channels.channel_name
+            , START_KEYWORD.user_id
+            , users.user_name
+            , START_KEYWORD.date_tz
+            -- start
+            , START_KEYWORD.ts AS start_ts
+            , START_KEYWORD.time_tz AS start_time_tz
+            , START_KEYWORD.type AS start_type
+            , START_KEYWORD.text AS start_text
+            -- end
+            , END_KEYWORD.ts AS end_ts
+            , END_KEYWORD.time_tz AS end_time_tz
+            , END_KEYWORD.type AS end_type
+            , END_KEYWORD.text AS end_text
+          FROM
+            (
+              SELECT
+                  rank
+                , messages.team_id
+                , messages.channel_id
+                , messages.user_id
+                , messages.ts
+                , messages.date_tz
+                , messages.time_tz
+                , messages.type
+                , messages.text
+              FROM
+                v_messages
+                INNER JOIN messages
+                  ON v_messages.message_id = messages.message_id
+                  AND messages.channel_id = @channel_id
+              WHERE
+                v_messages.text MATCH @startKeyword
+              GROUP BY
+                messages.team_id
+                , messages.channel_id
+                , messages.user_id
+                , messages.date_tz
+              ORDER BY
+                rank ASC
+            ) AS START_KEYWORD
+              LEFT OUTER JOIN
+            (
+              SELECT
+                  rank
+                , messages.team_id
+                , messages.channel_id
+                , messages.user_id
+                , messages.ts
+                , messages.date_tz
+                , messages.time_tz
+                , messages.type
+                , messages.text
+              FROM
+                v_messages
+                INNER JOIN messages
+                  ON v_messages.message_id = messages.message_id
+                  AND messages.channel_id = @channel_id
+              WHERE
+                v_messages.text MATCH @endKeyword
+              GROUP BY
+                messages.team_id
+                , messages.channel_id
+                , messages.user_id
+                , messages.date_tz
+              ORDER BY
+                rank ASC
+            ) AS END_KEYWORD
+              ON START_KEYWORD.team_id      = END_KEYWORD.team_id
+              AND START_KEYWORD.channel_id  = END_KEYWORD.channel_id
+              AND START_KEYWORD.user_id     = END_KEYWORD.user_id
+              AND START_KEYWORD.date_tz     = END_KEYWORD.date_tz
+              LEFT OUTER JOIN teams
+                ON START_KEYWORD.team_id = teams.team_id
+              LEFT OUTER JOIN channels
+                ON START_KEYWORD.channel_id = channels.channel_id
+              LEFT OUTER JOIN users
+                ON START_KEYWORD.user_id = users.user_id
+            ORDER BY
+              START_KEYWORD.team_id ASC
+              , START_KEYWORD.channel_id ASC
+              , START_KEYWORD.user_id ASC
+              , START_KEYWORD.date_tz ASC
+          `,
+          {
+            channel_id: params.channel_id,
+            oldest: params.oldest,
+            latest: params.latest,
+            startKeyword: params.startKeyword,
+            endKeyword: params.endKeyword,
+          }
+        )
+      );
+    },
     findUnique(params: {
       team_id: string;
       channel_id: string;
@@ -465,6 +592,8 @@ export const DB_CLIENT = {
             , users.user_name
             , messages.message_id
             , messages.ts
+            , messages.date_tz
+            , messages.time_tz
             , messages.type
             , messages.text
           FROM
@@ -508,6 +637,8 @@ export const DB_CLIENT = {
             , channel_id
             , user_id
             , ts
+            , date_tz
+            , time_tz
             , type
             , text
           ) VALUES (
@@ -515,6 +646,8 @@ export const DB_CLIENT = {
             , @channel_id
             , @user_id
             , @ts
+            , @date_tz
+            , @time_tz
             , @type
             , @text
           ) ON CONFLICT (

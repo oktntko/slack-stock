@@ -7,7 +7,8 @@ type ActionType =
   | "data-view"
   | "messages-stock"
   | "messages-view"
-  | "messages-search";
+  | "messages-search"
+  | "messages-timer";
 
 type OutputType = "console" | "csv" | "tsv" | "xlsx";
 

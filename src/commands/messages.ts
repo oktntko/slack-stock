@@ -67,6 +67,14 @@ export default class Messages extends Command {
           output: flags.output as OutputType,
         });
         break;
+      case "timer":
+        await COMMANDS.messages.timer({
+          channel: flags.channel,
+          oldest: period.oldest,
+          latest: period.latest,
+          output: flags.output as OutputType,
+        });
+        break;
       case "search":
         await COMMANDS.messages.search();
         break;

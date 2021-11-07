@@ -70,6 +70,8 @@ model Message {
   channel_id String
   user_id    String
   ts         String
+  date_tz    String
+  time_tz    String
   type       String
   text       String
 

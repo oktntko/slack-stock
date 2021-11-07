@@ -57,6 +57,21 @@ export const inputDate = async (input?: Dayjs, message?: string, initialiValue?:
   return selection;
 };
 
+export const inputKeyword = async (input?: string, message?: string): Promise<string> => {
+  if (input) return input;
+
+  const { keywords } = await INTERACTIVE.prompt([
+    {
+      type: "input",
+      name: "keyword",
+      prefix: icon.question,
+      message: message ?? "Enter keyword.",
+    },
+  ]);
+
+  return keywords;
+};
+
 export const selectAction = async (object?: ObjectType, input?: ActionType): Promise<ActionType> => {
   const actions = {
     messages: [
@@ -72,6 +87,10 @@ export const selectAction = async (object?: ObjectType, input?: ActionType): Pro
       {
         name: "🔍 Message search",
         value: "messages-search",
+      },
+      {
+        name: "⏲️  Message timer",
+        value: "messages-timer",
       },
     ],
     data: [

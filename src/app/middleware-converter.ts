@@ -3,6 +3,7 @@ import { Message } from "@slack/web-api/dist/response/ConversationsHistoryRespon
 import { Channel as SlackChannel } from "@slack/web-api/dist/response/ConversationsListResponse";
 import { Team as SlackTeam } from "@slack/web-api/dist/response/TeamInfoResponse";
 import { Member } from "@slack/web-api/dist/response/UsersListResponse";
+import dayjs from "dayjs";
 
 export const CONVERTER = {
   team: {
@@ -58,6 +59,8 @@ export const CONVERTER = {
         channel_id: message.channel_id,
         user_id: message.user!,
         ts: message.ts!,
+        date_tz: dayjs.unix(Number(message.ts!)).format("YYYY-MM-DD"),
+        time_tz: dayjs.unix(Number(message.ts!)).format("YYYY-MM-DD hh:mm:ss"),
         type: message.type!,
         text: message.text!,
       };
