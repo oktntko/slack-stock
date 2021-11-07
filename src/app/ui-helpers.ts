@@ -2,7 +2,7 @@ import { cli } from "cli-ux";
 import fs from "fs";
 import kleur from "kleur";
 import Papa from "papaparse";
-import toExcel from "write-excel-file/node";
+import xlsx from "xlsx";
 
 const alias = {
   info: kleur.cyan,
@@ -39,25 +39,21 @@ export const output = async (output: OutputType, data: any[], filePath: string, 
       toXsv(output === "tsv" ? "\t" : ",", data, filePath);
       break;
     case "xlsx":
-      await toExcel(data, {
-        schema: schema
-          ? schema
-          : Object.keys(data[0]).map((key) => ({
-              column: key,
-              value: (obj: any) => obj[key],
-            })),
-        filePath,
-        headerStyle: {
-          backgroundColor: "#eeeeee",
-          fontWeight: "bold",
-          align: "center",
-        },
-        dateFormat: "yyyy-mm-dd hh:mm:ss",
-      });
+      toExcel(data, filePath);
       break;
   }
 
   cli.info(`${icon.info} created "${color.info(filePath)}", ${data.length.toLocaleString()} raws`);
+};
+
+const toExcel = (values: any[], filePath: string) => {
+  console.log(values);
+  console.log(Object.values(values));
+  const data = [Object.keys(values[0]), ...values.map((v) => Object.values(v))];
+  const workbook = xlsx.utils.book_new();
+  const worksheet = xlsx.utils.aoa_to_sheet(data);
+  xlsx.utils.book_append_sheet(workbook, worksheet, "sheet1");
+  xlsx.writeFile(workbook, filePath);
 };
 
 const toXsv = (delimiter: string, data: any[], filePath: string) => {
