@@ -31,8 +31,7 @@ export const CONTROLLER = {
 
       return res.members
         .map((member) => CONVERTER.user.convert(member))
-        .map((member) => DB_CLIENT.users.upsert(member))
-        .reduce((previous, current) => previous + current.changes, 0);
+        .map((member) => DB_CLIENT.users.upsert(member));
     },
     async find(params: { team_id?: string } = {}) {
       return DB_CLIENT.users.findMany(params);
@@ -45,8 +44,7 @@ export const CONTROLLER = {
 
       return res.channels
         .map((channel) => CONVERTER.channel.convert({ ...channel, team_id }))
-        .map((channel) => DB_CLIENT.channels.upsert(channel))
-        .reduce((previous, current) => previous + current.changes, 0);
+        .map((channel) => DB_CLIENT.channels.upsert(channel));
     },
     async find(params: { team_id?: string } = {}) {
       return DB_CLIENT.channels.findMany(params).map((channel) => {
@@ -112,7 +110,7 @@ export const CONTROLLER = {
       oldest: Dayjs;
       latest: Dayjs;
       startKeyword: string;
-      endKeyword: string;
+      stopKeyword: string;
     }) {
       return DB_CLIENT.messages.vFindManyTimer(params);
     },

@@ -39,6 +39,11 @@ export default class Messages extends Command {
       multiple: false,
       options: ["console", "csv", "tsv", "xlsx"],
     }),
+    keyword: flags.string({
+      char: "k",
+      multiple: true,
+      description: "if stock message data, set from date, format=yyyy-MM-dd",
+    }),
   };
 
   static args = [
@@ -54,6 +59,7 @@ export default class Messages extends Command {
     const { args, flags } = this.parse(Messages);
 
     const period = parsePeriod(flags.period, flags.month, flags.week, flags.day);
+    const { startKeyword, stopKeyword } = parseKeyword(flags.keyword);
 
     switch (args.action) {
       case "stock":
@@ -72,6 +78,8 @@ export default class Messages extends Command {
           channel: flags.channel,
           oldest: period.oldest,
           latest: period.latest,
+          startKeyword,
+          stopKeyword,
           output: flags.output as OutputType,
         });
         break;
@@ -117,8 +125,21 @@ export const parsePeriod = (
 
     const oldest = latest.subtract(1, month ? "month" : week ? "week" : "day");
     return { oldest: oldest.startOf("day"), latest: latest.endOf("day") };
-  }
 
-  // オプションなしの場合
-  return {};
+    // オプションなしの場合
+  } else {
+    return {};
+  }
+};
+
+export const parseKeyword = (keyword?: string[]): { startKeyword?: string; stopKeyword?: string } => {
+  if (keyword && keyword.length > 0) {
+    if (keyword.length !== 2) throw new Error();
+
+    return { startKeyword: keyword[0], stopKeyword: keyword[1] };
+
+    // オプションなしの場合
+  } else {
+    return {};
+  }
 };

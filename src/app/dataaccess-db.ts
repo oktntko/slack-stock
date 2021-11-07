@@ -14,6 +14,7 @@ const db = sqlite3({
   migrate: false,
 });
 
+// コマンドが実行されたらデータベースを作成する。
 db.exec(`
 -- CreateTable
 CREATE TABLE IF NOT EXISTS "teams" (
@@ -87,16 +88,16 @@ CREATE UNIQUE INDEX IF NOT EXISTS "messages_team_id_channel_id_user_id_ts_type_k
 export const DB_CLIENT = {
   teams: {
     findMany(): Team[] {
-      return Array.from(
-        db.queryIterate(`
+      return db.query(`
           SELECT
               team_id
             , team_name
             , token
           FROM
             teams
-          `)
-      );
+          ORDER BY
+            team_name
+          `);
     },
     findUnique({ team_id, team_name }: RequireOne<Prisma.TeamWhereUniqueInput>): Team | undefined {
       return db.queryFirstRow(
@@ -116,8 +117,8 @@ export const DB_CLIENT = {
         }
       );
     },
-    upsert(team: Team) {
-      return db.run(
+    upsert(team: Team): Team | undefined {
+      return db.queryFirstRow(
         `
           INSERT INTO teams (
               team_id
@@ -133,6 +134,7 @@ export const DB_CLIENT = {
               team_id   = @team_id
             , team_name = @team_name
             , token     = @token
+          RETURNING *
                 `,
         team
       );
@@ -140,9 +142,8 @@ export const DB_CLIENT = {
   },
   users: {
     findMany(params: { team_id?: string } = {}): (User & Pick<Team, "team_id" | "team_name">)[] {
-      return Array.from(
-        db.queryIterate(
-          `
+      return db.query(
+        `
           SELECT
               users.team_id
             , teams.team_name
@@ -168,9 +169,11 @@ export const DB_CLIENT = {
           `
               : ""
           }
+          ORDER BY
+            team_name
+            , user_name
           `,
-          params
-        )
+        params
       );
     },
     findUnique(user_id: string): (User & Pick<Team, "team_id" | "team_name">) | undefined {
@@ -199,8 +202,8 @@ export const DB_CLIENT = {
         }
       );
     },
-    upsert(user: User) {
-      return db.run(
+    upsert(user: User): User | undefined {
+      return db.queryFirstRow(
         `
           INSERT INTO users (
               user_id
@@ -239,6 +242,7 @@ export const DB_CLIENT = {
             , is_app_user         = @is_app_user
             , is_bot              = @is_bot
             , deleted             = @deleted
+          RETURNING *
       `,
         user
       );
@@ -246,9 +250,8 @@ export const DB_CLIENT = {
   },
   channels: {
     findMany(params: { team_id?: string } = {}): (Channel & Team)[] {
-      return Array.from(
-        db.queryIterate(
-          `
+      return db.query(
+        `
           SELECT
               channels.team_id
             , teams.team_name
@@ -278,9 +281,11 @@ export const DB_CLIENT = {
           `
               : ""
           }
+          ORDER BY
+            team_name
+            , channel_name
           `,
-          params
-        )
+        params
       );
     },
     findUnique(channel_id: string): (Channel & Team) | undefined {
@@ -315,8 +320,8 @@ export const DB_CLIENT = {
         }
       );
     },
-    upsert(channel: Channel) {
-      return db.run(
+    upsert(channel: Channel): Channel | undefined {
+      return db.queryFirstRow(
         `
           INSERT INTO channels (
               channel_id
@@ -364,6 +369,7 @@ export const DB_CLIENT = {
             , is_org_shared         = @is_org_shared
             , is_pending_ext_shared = @is_pending_ext_shared
             , is_ext_shared         = @is_ext_shared
+          RETURNING *
                 `,
         channel
       );
@@ -375,9 +381,8 @@ export const DB_CLIENT = {
       oldest: Dayjs;
       latest: Dayjs;
     }): (Message & Pick<Team, "team_name"> & Pick<Channel, "channel_name"> & Pick<User, "user_name">)[] {
-      return Array.from(
-        db.queryIterate(
-          `
+      return db.query(
+        `
           SELECT
               messages.team_id
             , teams.team_name
@@ -402,13 +407,17 @@ export const DB_CLIENT = {
           WHERE
             messages.channel_id = @channel_id
             AND messages.ts BETWEEN @oldest AND @latest
+          ORDER BY
+            team_name
+            , channel_name
+            , user_name
+            , ts
           `,
-          {
-            channel_id: params.channel_id,
-            oldest: String(params.oldest.unix()),
-            latest: String(params.latest.unix()),
-          }
-        )
+        {
+          channel_id: params.channel_id,
+          oldest: String(params.oldest.unix()),
+          latest: String(params.latest.unix()),
+        }
       );
     },
     vFindMany(params: {
@@ -417,9 +426,8 @@ export const DB_CLIENT = {
       Pick<Team, "team_name"> &
       Pick<Channel, "channel_name"> &
       Pick<User, "user_name"> & { rank: number })[] {
-      return Array.from(
-        db.queryIterate(
-          `
+      return db.query(
+        `
           SELECT
               rank
             , messages.team_id
@@ -448,9 +456,9 @@ export const DB_CLIENT = {
             v_messages.text MATCH @text
           ORDER BY
             rank ASC
+            , ts DESC
           `,
-          params
-        )
+        params
       );
     },
     vFindManyTimer(params: {
@@ -458,7 +466,7 @@ export const DB_CLIENT = {
       oldest: Dayjs;
       latest: Dayjs;
       startKeyword: string;
-      endKeyword: string;
+      stopKeyword: string;
     }): (Pick<Team, "team_id" | "team_name"> &
       Pick<Channel, "channel_id" | "channel_name"> &
       Pick<User, "user_id" | "user_name"> &
@@ -467,14 +475,13 @@ export const DB_CLIENT = {
         start_time_tz: string;
         start_type: string;
         start_text: string;
-        end_ts: string;
-        end_time_tz: string;
-        end_type: string;
-        end_text: string;
+        stop_ts: string;
+        stop_time_tz: string;
+        stop_type: string;
+        stop_text: string;
       })[] {
-      return Array.from(
-        db.queryIterate(
-          `
+      return db.query(
+        `
           SELECT
             -- common
               START_KEYWORD.team_id
@@ -489,89 +496,37 @@ export const DB_CLIENT = {
             , START_KEYWORD.time_tz AS start_time_tz
             , START_KEYWORD.type AS start_type
             , START_KEYWORD.text AS start_text
-            -- end
-            , END_KEYWORD.ts AS end_ts
-            , END_KEYWORD.time_tz AS end_time_tz
-            , END_KEYWORD.type AS end_type
-            , END_KEYWORD.text AS end_text
+            -- stop
+            , STOP_KEYWORD.ts AS stop_ts
+            , STOP_KEYWORD.time_tz AS stop_time_tz
+            , STOP_KEYWORD.type AS stop_type
+            , STOP_KEYWORD.text AS stop_text
           FROM
-            (
-              SELECT
-                  rank
-                , messages.team_id
-                , messages.channel_id
-                , messages.user_id
-                , messages.ts
-                , messages.date_tz
-                , messages.time_tz
-                , messages.type
-                , messages.text
-              FROM
-                v_messages
-                INNER JOIN messages
-                  ON v_messages.message_id = messages.message_id
-                  AND messages.channel_id = @channel_id
-              WHERE
-                v_messages.text MATCH @startKeyword
-              GROUP BY
-                messages.team_id
-                , messages.channel_id
-                , messages.user_id
-                , messages.date_tz
-              ORDER BY
-                rank ASC
-            ) AS START_KEYWORD
-              LEFT OUTER JOIN
-            (
-              SELECT
-                  rank
-                , messages.team_id
-                , messages.channel_id
-                , messages.user_id
-                , messages.ts
-                , messages.date_tz
-                , messages.time_tz
-                , messages.type
-                , messages.text
-              FROM
-                v_messages
-                INNER JOIN messages
-                  ON v_messages.message_id = messages.message_id
-                  AND messages.channel_id = @channel_id
-              WHERE
-                v_messages.text MATCH @endKeyword
-              GROUP BY
-                messages.team_id
-                , messages.channel_id
-                , messages.user_id
-                , messages.date_tz
-              ORDER BY
-                rank ASC
-            ) AS END_KEYWORD
-              ON START_KEYWORD.team_id      = END_KEYWORD.team_id
-              AND START_KEYWORD.channel_id  = END_KEYWORD.channel_id
-              AND START_KEYWORD.user_id     = END_KEYWORD.user_id
-              AND START_KEYWORD.date_tz     = END_KEYWORD.date_tz
-              LEFT OUTER JOIN teams
-                ON START_KEYWORD.team_id = teams.team_id
-              LEFT OUTER JOIN channels
-                ON START_KEYWORD.channel_id = channels.channel_id
-              LEFT OUTER JOIN users
-                ON START_KEYWORD.user_id = users.user_id
-            ORDER BY
-              START_KEYWORD.team_id ASC
-              , START_KEYWORD.channel_id ASC
-              , START_KEYWORD.user_id ASC
-              , START_KEYWORD.date_tz ASC
+            (${timerSQL("startKeyword")}) AS START_KEYWORD
+            LEFT OUTER JOIN (${timerSQL("stopKeyword")}) AS STOP_KEYWORD
+              ON START_KEYWORD.team_id      = STOP_KEYWORD.team_id
+              AND START_KEYWORD.channel_id  = STOP_KEYWORD.channel_id
+              AND START_KEYWORD.user_id     = STOP_KEYWORD.user_id
+              AND START_KEYWORD.date_tz     = STOP_KEYWORD.date_tz
+            LEFT OUTER JOIN teams
+              ON START_KEYWORD.team_id = teams.team_id
+            LEFT OUTER JOIN channels
+              ON START_KEYWORD.channel_id = channels.channel_id
+            LEFT OUTER JOIN users
+              ON START_KEYWORD.user_id = users.user_id
+          ORDER BY
+            team_name ASC
+            , channel_name ASC
+            , user_name ASC
+            , START_KEYWORD.date_tz ASC
           `,
-          {
-            channel_id: params.channel_id,
-            oldest: params.oldest,
-            latest: params.latest,
-            startKeyword: params.startKeyword,
-            endKeyword: params.endKeyword,
-          }
-        )
+        {
+          channel_id: params.channel_id,
+          oldest: String(params.oldest.unix()),
+          latest: String(params.latest.unix()),
+          startKeyword: params.startKeyword,
+          stopKeyword: params.stopKeyword,
+        }
       );
     },
     findUnique(params: {
@@ -691,3 +646,31 @@ export const DB_CLIENT = {
     },
   },
 };
+
+const timerSQL = (textVar: string) => `
+SELECT
+  rank
+  , messages.team_id
+  , messages.channel_id
+  , messages.user_id
+  , messages.ts
+  , messages.date_tz
+  , messages.time_tz
+  , messages.type
+  , messages.text
+FROM
+  v_messages
+  INNER JOIN messages
+    ON v_messages.message_id = messages.message_id
+WHERE
+  v_messages.text MATCH @${textVar}
+  AND messages.channel_id = @channel_id
+  AND messages.ts BETWEEN @oldest AND @latest
+GROUP BY
+  messages.team_id
+  , messages.channel_id
+  , messages.user_id
+  , messages.date_tz
+ORDER BY
+  rank ASC
+`;

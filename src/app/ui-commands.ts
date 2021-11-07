@@ -5,13 +5,13 @@ import os from "os";
 import path from "path";
 import { CONTROLLER } from "./middleware-controller";
 import {
-  inputDate,
-  inputKeyword,
-  inputToken,
+  enterFirstDate,
+  enterKeyword,
+  enterLastDate,
   selectAction,
   selectChannels,
   selectContinue,
-  selectMessage,
+  searchMessage,
   selectOutputType,
   selectTeam,
 } from "./ui-components";
@@ -46,7 +46,7 @@ export const COMMANDS = {
       const teams = await CONTROLLER.teams.find();
 
       if (teams.length > 0) {
-        await output(outputType, teams, filePath(`teams_${dayjs().format("YYYY-MM-DD")}.${outputType}`));
+        await output(outputType, teams, filePath.teams(outputType));
 
         cli.action.stop(message.success);
       } else {
@@ -59,9 +59,9 @@ export const COMMANDS = {
       const team = await selectTeam(options.team_name);
 
       cli.action.start(message.progressing);
-      const result = (await CONTROLLER.users.fetch(team)) + (await CONTROLLER.channels.fetch(team));
+      const [users, channels] = await Promise.all([CONTROLLER.users.fetch(team), CONTROLLER.channels.fetch(team)]);
 
-      if (result > 0) {
+      if (users.length > 0 && channels.length > 0) {
         cli.action.stop(message.success);
       } else {
         cli.action.stop(message.no_data);
@@ -76,8 +76,8 @@ export const COMMANDS = {
 
       if (users.length > 0 && channels.length > 0) {
         await Promise.all([
-          output(outputType, users, filePath(`@slst_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`)),
-          output(outputType, channels, filePath(`@slst_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`)),
+          output(outputType, users, filePath.users(outputType)),
+          output(outputType, channels, filePath.channels(outputType)),
         ]);
 
         cli.action.stop(message.success);
@@ -91,9 +91,9 @@ export const COMMANDS = {
       const team = await selectTeam(options.team_name);
 
       cli.action.start(message.progressing);
-      const result = await CONTROLLER.users.fetch(team);
+      const users = await CONTROLLER.users.fetch(team);
 
-      if (result > 0) {
+      if (users.length > 0) {
         cli.action.stop(message.success);
       } else {
         cli.action.stop(message.no_data);
@@ -107,7 +107,7 @@ export const COMMANDS = {
       const users = await CONTROLLER.users.find(team);
 
       if (users.length > 0) {
-        await output(outputType, users, filePath(`@slst_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`));
+        await output(outputType, users, filePath.users(outputType));
 
         cli.action.stop(message.success);
       } else {
@@ -120,9 +120,9 @@ export const COMMANDS = {
       const team = await selectTeam(options.team_name);
 
       cli.action.start(message.progressing);
-      const result = await CONTROLLER.channels.fetch(team);
+      const channels = await CONTROLLER.channels.fetch(team);
 
-      if (result > 0) {
+      if (channels.length > 0) {
         cli.action.stop(message.success);
       } else {
         cli.action.stop(message.no_data);
@@ -136,7 +136,7 @@ export const COMMANDS = {
       const channels = await CONTROLLER.channels.find(team);
 
       if (channels.length > 0) {
-        await output(outputType, channels, filePath(`@slst_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`));
+        await output(outputType, channels, filePath.channels(outputType));
 
         cli.action.stop(message.success);
       } else {
@@ -147,8 +147,8 @@ export const COMMANDS = {
   messages: {
     async stock(options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs } = {}) {
       const channels = await selectChannels(options.channel, options.team_id);
-      const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
-      const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
+      const oldest = await enterFirstDate(options.oldest);
+      const latest = await enterLastDate(options.latest);
 
       cli.action.start(message.progressing);
       const result = (
@@ -175,8 +175,8 @@ export const COMMANDS = {
       options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs; output?: OutputType } = {}
     ) {
       const channels = await selectChannels(options.channel, options.team_id);
-      const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
-      const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
+      const oldest = await enterFirstDate(options.oldest);
+      const latest = await enterLastDate(options.latest);
       const outputType = await selectOutputType(options.output);
 
       cli.action.start(message.progressing);
@@ -193,11 +193,7 @@ export const COMMANDS = {
       ).flat();
 
       if (messages.length > 0) {
-        await output(
-          outputType,
-          messages,
-          filePath(`@slst_messages_${oldest.format("YYYY-MM-DD")}〜${latest.format("YYYY-MM-DD")}.${outputType}`)
-        );
+        await output(outputType, messages, filePath.messages(oldest, latest, outputType));
 
         cli.action.stop(message.success);
       } else {
@@ -205,13 +201,21 @@ export const COMMANDS = {
       }
     },
     async timer(
-      options: { channel?: string; team_id?: string; oldest?: Dayjs; latest?: Dayjs; output?: OutputType } = {}
+      options: {
+        channel?: string;
+        team_id?: string;
+        oldest?: Dayjs;
+        latest?: Dayjs;
+        startKeyword?: string;
+        stopKeyword?: string;
+        output?: OutputType;
+      } = {}
     ) {
       const channels = await selectChannels(options.channel, options.team_id);
-      const oldest = await inputDate(options.oldest, "Select start date", dayjs().subtract(1, "day").startOf("day"));
-      const latest = await inputDate(options.latest, "Select end   date", dayjs().endOf("day") /* today */);
-      const startKeyword = await inputKeyword("開始", "Enter start keyword");
-      const endKeyword = await inputKeyword("終了", "Enter end   keyword");
+      const oldest = await enterFirstDate(options.oldest);
+      const latest = await enterLastDate(options.latest);
+      const startKeyword = await enterKeyword("Enter start keyword", options.startKeyword);
+      const stopKeyword = await enterKeyword("Enter stop  keyword", options.stopKeyword);
       const outputType = await selectOutputType(options.output);
 
       cli.action.start(message.progressing);
@@ -223,18 +227,14 @@ export const COMMANDS = {
               oldest,
               latest,
               startKeyword,
-              endKeyword,
+              stopKeyword,
             })
           )
         )
       ).flat();
 
       if (messages.length > 0) {
-        await output(
-          outputType,
-          messages,
-          filePath(`@slst_messages_timer_${oldest.format("YYYY-MM-DD")}〜${latest.format("YYYY-MM-DD")}.${outputType}`)
-        );
+        await output(outputType, messages, filePath.messages(oldest, latest, outputType));
 
         cli.action.stop(message.success);
       } else {
@@ -242,7 +242,7 @@ export const COMMANDS = {
       }
     },
     async search() {
-      const _ = await selectMessage();
+      const _ = await searchMessage();
     },
   },
   async menu(args: { object?: ObjectType; action?: ActionType } = {}, options: any = {}) {
@@ -286,7 +286,7 @@ export const COMMANDS = {
 
 const addTeam = async (options: { token?: string }) => {
   while (true) {
-    const token = await inputToken(options.token);
+    const token = await enterKeyword("What is your token?", options.token);
 
     try {
       const team = await CONTROLLER.teams.add(token);
@@ -297,4 +297,20 @@ const addTeam = async (options: { token?: string }) => {
   }
 };
 
-const filePath = (fileName: string) => path.join(os.homedir(), fileName);
+const filePath = {
+  base(fileName: string) {
+    return path.join(os.homedir(), fileName);
+  },
+  teams(outputType: OutputType) {
+    return this.base(`@slst_teams_${dayjs().format("YYYY-MM-DD")}.${outputType}`);
+  },
+  channels(outputType: OutputType) {
+    return this.base(`@slst_channels_${dayjs().format("YYYY-MM-DD")}.${outputType}`);
+  },
+  users(outputType: OutputType) {
+    return this.base(`@slst_users_${dayjs().format("YYYY-MM-DD")}.${outputType}`);
+  },
+  messages(oldest: Dayjs, latest: Dayjs, outputType: OutputType) {
+    return this.base(`@slst_messages_${oldest.format("YYYY-MM-DD")}〜${latest.format("YYYY-MM-DD")}.${outputType}`);
+  },
+};

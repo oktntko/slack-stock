@@ -10,22 +10,30 @@ inquirer.registerPrompt("date", require("inquirer-date-prompt"));
 
 const INTERACTIVE = inquirer;
 
-export const inputToken = async (input?: string): Promise<string> => {
+export const enterKeyword = async (message: string, input?: string): Promise<string> => {
   if (input) return input;
 
-  const { token } = await INTERACTIVE.prompt([
+  const { keyword } = await INTERACTIVE.prompt([
     {
       type: "input",
-      name: "token",
+      name: "keyword",
       prefix: icon.question,
-      message: "What is your token?",
+      message,
     },
   ]);
 
-  return token;
+  return keyword;
 };
 
-export const inputDate = async (input?: Dayjs, message?: string, initialiValue?: Dayjs): Promise<Dayjs> => {
+export const enterFirstDate = async (input?: Dayjs) => {
+  return await enterDate("Select first date", dayjs().subtract(1, "day").startOf("day"), input);
+};
+
+export const enterLastDate = async (input?: Dayjs) => {
+  return await enterDate("Select last  date", dayjs().endOf("day"), input);
+};
+
+const enterDate = async (message: string, initialiValue: Dayjs, input?: Dayjs): Promise<Dayjs> => {
   if (input) {
     if (input.isValid()) {
       return input;
@@ -39,8 +47,8 @@ export const inputDate = async (input?: Dayjs, message?: string, initialiValue?:
       type: "date",
       name: "selection",
       prefix: icon.question,
-      message: message ?? "Select date",
-      default: initialiValue ? initialiValue.toDate() : dayjs().toDate(),
+      message: message,
+      default: initialiValue.toDate(),
       filter: (d: Date) => dayjs(d),
       format: {
         year: "numeric",
@@ -55,21 +63,6 @@ export const inputDate = async (input?: Dayjs, message?: string, initialiValue?:
   ]);
 
   return selection;
-};
-
-export const inputKeyword = async (input?: string, message?: string): Promise<string> => {
-  if (input) return input;
-
-  const { keywords } = await INTERACTIVE.prompt([
-    {
-      type: "input",
-      name: "keyword",
-      prefix: icon.question,
-      message: message ?? "Enter keyword.",
-    },
-  ]);
-
-  return keywords;
 };
 
 export const selectAction = async (object?: ObjectType, input?: ActionType): Promise<ActionType> => {
@@ -119,9 +112,7 @@ export const selectAction = async (object?: ObjectType, input?: ActionType): Pro
 
   const choices = object
     ? actions[object]
-    : Object.values(actions).reduce((previous, current) => {
-        return previous.concat(current);
-      }, []);
+    : Object.values(actions).reduce((previous, current) => previous.concat(current), []);
 
   const { selection } = await INTERACTIVE.prompt([
     {
@@ -236,14 +227,13 @@ export const selectChannels = async (input?: string, team_id?: string): Promise<
   return channel;
 };
 
-export const selectMessage = async (input?: string): Promise<string> => {
-  if (input) return input;
-
+export const searchMessage = async (): Promise<string> => {
   const { message } = await INTERACTIVE.prompt([
     {
       type: "autocomplete",
       name: "keyword",
-      message: "Input keyword",
+      prefix: icon.question,
+      message: "Enter keyword",
       source(_: any, input: string) {
         return CONTROLLER.messages.search({ text: input });
       },
