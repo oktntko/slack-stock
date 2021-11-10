@@ -6,13 +6,13 @@
 [![License](https://img.shields.io/npm/l/slack-stock.svg)](https://github.com/oktntko/slack-stock/blob/master/package.json)
 
 <!-- toc -->
-* [slack-stock](#slack-stock)
-* [About](#about)
-* [Introduction](#introduction)
-* [Installation](#installation)
-* [add](#add)
-* [Commands](#commands)
-* [Program Resources](#program-resources)
+
+- [slack-stock](#slack-stock)
+- [About](#about)
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Commands](#commands)
+- [Program Resources](#program-resources)
 <!-- tocstop -->
 
 # About
@@ -24,8 +24,7 @@ Have a great Slack Life with slack-stock!
 
 # Introduction
 
-- stock => view(console)
-- cron => stock => after 1 month => view(file)
+https://user-images.githubusercontent.com/72344657/141394536-e5fc5a55-2469-49ec-a142-8fa2e0522ec5.mp4
 
 # Installation
 
@@ -123,13 +122,9 @@ Only Token is issued, and the actual state of the application has not been compl
 
 ```sh-session
 $ npm install -g slack-stock
-$ slst COMMAND
-running command...
 $ slst (-v|--version|version)
-slack-stock/0.1.0 linux-x64 node-v14.15.3
-$ slst --help [COMMAND]
-USAGE
-  $ slst COMMAND
+# First, add your OAuth token
+$ slst teams add --token=xoxp-xxxxxxxxxxxxx-xxxxxxxxxxxxx-xxxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ...
 ```
 
@@ -138,22 +133,51 @@ USAGE
 - downloads from release page.
 <!-- installationstop -->
 
-# add
-
-<!-- add -->
-
-video
-
-<!-- addtop -->
-
 # Commands
 
 <!-- commands -->
-* [`slst data [ACTION]`](#slst-data-action)
-* [`slst help [COMMAND]`](#slst-help-command)
-* [`slst menu`](#slst-menu)
-* [`slst messages [ACTION]`](#slst-messages-action)
-* [`slst teams [ACTION]`](#slst-teams-action)
+
+- [`slst menu`](#slst-menu)
+- [`slst teams [ACTION]`](#slst-teams-action)
+- [`slst data [ACTION]`](#slst-data-action)
+- [`slst messages [ACTION]`](#slst-messages-action)
+- [`slst help [COMMAND]`](#slst-help-command)
+
+## `slst menu`
+
+Select menu
+
+```
+USAGE
+  $ slst menu
+
+OPTIONS
+  -h, --help  show CLI help
+
+ALIASES
+  $ slst
+```
+
+## `slst teams [ACTION]`
+
+You can add & view team
+
+```
+USAGE
+  $ slst teams [ACTION]
+
+ARGUMENTS
+  ACTION  (add|view) OAuth token installed your workspace
+
+OPTIONS
+  -h, --help                         show CLI help
+  -t, --output=console|csv|tsv|xlsx  Select output format
+  -t, --token=token                  OAuth token installed your workspace
+
+ALIASES
+  $ slst t
+  $ slst team
+```
 
 ## `slst data [ACTION]`
 
@@ -171,42 +195,6 @@ OPTIONS
 ALIASES
   $ slst d
 ```
-
-_See code: [src/commands/data.ts](https://github.com/oktntko/slack-stock/blob/v0.1.1/src/commands/data.ts)_
-
-## `slst help [COMMAND]`
-
-display help for slst
-
-```
-USAGE
-  $ slst help [COMMAND]
-
-ARGUMENTS
-  COMMAND  command to show help for
-
-OPTIONS
-  --all  see all commands in CLI
-```
-
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.3/src/commands/help.ts)_
-
-## `slst menu`
-
-Select menu
-
-```
-USAGE
-  $ slst menu
-
-OPTIONS
-  -h, --help  show CLI help
-
-ALIASES
-  $ slst
-```
-
-_See code: [src/commands/menu.ts](https://github.com/oktntko/slack-stock/blob/v0.1.1/src/commands/menu.ts)_
 
 ## `slst messages [ACTION]`
 
@@ -231,32 +219,35 @@ ALIASES
   $ slst message
 ```
 
-_See code: [src/commands/messages.ts](https://github.com/oktntko/slack-stock/blob/v0.1.1/src/commands/messages.ts)_
+## `slst help [COMMAND]`
 
-## `slst teams [ACTION]`
-
-You can add & view team
+display help for slst
 
 ```
 USAGE
-  $ slst teams [ACTION]
+  $ slst help [COMMAND]
 
 ARGUMENTS
-  ACTION  (add|view) OAuth token installed your workspace
+  COMMAND  command to show help for
 
 OPTIONS
-  -h, --help                         show CLI help
-  -t, --output=console|csv|tsv|xlsx  Select output format
-  -t, --token=token                  OAuth token installed your workspace
-
-ALIASES
-  $ slst t
-  $ slst team
+  --all  see all commands in CLI
 ```
 
-_See code: [src/commands/teams.ts](https://github.com/oktntko/slack-stock/blob/v0.1.1/src/commands/teams.ts)_
 <!-- commandsstop -->
 
 # Program Resources
 
-## Options
+This app stocks data in a local database.
+
+```
+~/.slack-stock.db        - SQLite DB this app use. Do not remove or modify.
+~/.slack-stock.password  - OAuth token encrypt/decrypt key. Do not remove or modify.
+```
+
+## Uninstall
+
+```
+npm uninstall -g slack-stock
+rm ~/.slack-stock.db ~/.slack-stock.password
+```

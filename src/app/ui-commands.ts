@@ -272,7 +272,7 @@ export const COMMANDS = {
           await COMMANDS.messages.search();
           break;
         case "messages-timer":
-          await COMMANDS.messages.timer();
+          await COMMANDS.messages.timer(options);
           break;
       }
 

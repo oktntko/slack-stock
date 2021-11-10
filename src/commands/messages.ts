@@ -51,7 +51,7 @@ export default class Messages extends Command {
       name: "action",
       required: false,
       hidden: false,
-      options: ["stock", "view", "search"],
+      options: ["stock", "view", "search", "timer"],
     },
   ];
 
