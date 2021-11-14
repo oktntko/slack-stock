@@ -29,7 +29,8 @@ export const message = {
   no_data: `${icon.error} No data`,
 };
 
-export const output = async (output: OutputType, data: any[], filePath: string, schema?: any[]) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const output = async (output: OutputType, data: any[], filePath: string) => {
   switch (output) {
     case "console":
       console.table(data);
@@ -46,9 +47,8 @@ export const output = async (output: OutputType, data: any[], filePath: string, 
   cli.info(`${icon.info} created "${color.info(filePath)}", ${data.length.toLocaleString()} raws`);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toExcel = (values: any[], filePath: string) => {
-  console.log(values);
-  console.log(Object.values(values));
   const data = [Object.keys(values[0]), ...values.map((v) => Object.values(v))];
   const workbook = xlsx.utils.book_new();
   const worksheet = xlsx.utils.aoa_to_sheet(data);
@@ -56,6 +56,7 @@ const toExcel = (values: any[], filePath: string) => {
   xlsx.writeFile(workbook, filePath);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const toXsv = (delimiter: string, data: any[], filePath: string) => {
   const parsed = Papa.unparse(data, {
     delimiter,

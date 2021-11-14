@@ -15,7 +15,7 @@ export const CHAT_CLIENT = {
   },
 
   conversations: {
-    list(token: string, types: string = "public_channel,private_channel", limit?: number, cursor?: string) {
+    list(token: string, types = "public_channel,private_channel", limit?: number, cursor?: string) {
       return client.conversations.list({
         token,
         types,

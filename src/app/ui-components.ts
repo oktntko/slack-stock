@@ -4,8 +4,9 @@ import dayjs, { Dayjs } from "dayjs";
 import inquirer from "inquirer";
 import { CONTROLLER } from "./middleware-controller";
 import { color, icon } from "./ui-helpers";
-inquirer.registerPrompt("autocomplete", require("inquirer-autocomplete-prompt"));
-// https://intl-date-time-format-checker.pages.dev/
+import autocomplete from "inquirer-autocomplete-prompt";
+inquirer.registerPrompt("autocomplete", autocomplete);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 inquirer.registerPrompt("date", require("inquirer-date-prompt"));
 
 const INTERACTIVE = inquirer;
@@ -65,7 +66,7 @@ const enterDate = async (message: string, initialiValue: Dayjs, input?: Dayjs): 
   return selection;
 };
 
-export const selectAction = async (object?: ObjectType, input?: ActionType): Promise<ActionType> => {
+export const selectAction = async (object?: ObjectType): Promise<ActionType> => {
   const actions = {
     messages: [
       new inquirer.Separator("== 💬 Messages ========================="),
@@ -234,6 +235,7 @@ export const searchMessage = async (): Promise<string> => {
       name: "keyword",
       prefix: icon.question,
       message: "Enter keyword",
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       source(_: any, input: string) {
         return CONTROLLER.messages.search({ text: input });
       },

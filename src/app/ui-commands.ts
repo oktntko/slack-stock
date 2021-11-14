@@ -245,9 +245,10 @@ export const COMMANDS = {
       const _ = await searchMessage();
     },
   },
-  async menu(args: { object?: ObjectType; action?: ActionType } = {}, options: any = {}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async menu(args: { object?: ObjectType } = {}, options: any = {}) {
     while (true) {
-      const action = await selectAction(args.object, args.action);
+      const action = await selectAction(args.object);
 
       switch (action) {
         case "teams-add":

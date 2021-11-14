@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Channel, Prisma, Team, User } from "@prisma/client";
 import { Message } from "@slack/web-api/dist/response/ConversationsHistoryResponse";
 import { Channel as SlackChannel } from "@slack/web-api/dist/response/ConversationsListResponse";
