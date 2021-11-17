@@ -9,10 +9,9 @@ import { color } from "./ui-helpers";
 export const CONTROLLER = {
   teams: {
     async add(token: string) {
-      const res = await CHAT_CLIENT.team.info(token);
-      if (res.team == null) throw new Error("An unexpected error has occurred.");
+      const resTeam = await CHAT_CLIENT.team.info(token);
 
-      const team = CONVERTER.team.convert({ ...res.team, token });
+      const team = CONVERTER.team.convert({ ...resTeam, token });
       const _ = DB_CLIENT.teams.upsert({ ...team, token: encrypt(token) });
 
       return team;
@@ -26,12 +25,9 @@ export const CONTROLLER = {
   },
   users: {
     async fetch({ token }: { token: string }) {
-      const res = await CHAT_CLIENT.users.list(token);
-      if (res.members == null) throw new Error("An unexpected error has occurred.");
+      const members = await CHAT_CLIENT.users.list(token);
 
-      return res.members
-        .map((member) => CONVERTER.user.convert(member))
-        .map((member) => DB_CLIENT.users.upsert(member));
+      return members.map((member) => CONVERTER.user.convert(member)).map((member) => DB_CLIENT.users.upsert(member));
     },
     async find(params: { team_id?: string } = {}) {
       return DB_CLIENT.users.findMany(params);
@@ -39,10 +35,9 @@ export const CONTROLLER = {
   },
   channels: {
     async fetch({ team_id, token }: Pick<Team, "team_id" | "token">) {
-      const res = await CHAT_CLIENT.conversations.list(token);
-      if (res.channels == null) throw new Error("An unexpected error has occurred.");
+      const channels = await CHAT_CLIENT.conversations.list(token);
 
-      return res.channels
+      return channels
         .map((channel) => CONVERTER.channel.convert({ ...channel, team_id }))
         .map((channel) => DB_CLIENT.channels.upsert(channel));
     },
@@ -61,10 +56,9 @@ export const CONTROLLER = {
       oldest,
       latest,
     }: Pick<Team, "team_id" | "token"> & { channel_id: string; oldest: Dayjs; latest: Dayjs }) {
-      const res = await CHAT_CLIENT.conversations.history(token, channel_id, oldest, latest);
-      if (res.messages == null) throw new Error("An unexpected error has occurred.");
+      const messages = await CHAT_CLIENT.conversations.history(token, channel_id, oldest, latest);
 
-      return res.messages
+      return messages
         .map((message) => CONVERTER.message.convert({ ...message, team_id, channel_id }))
         .map((message) => {
           const result = DB_CLIENT.messages.upsert(message);

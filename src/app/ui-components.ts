@@ -75,7 +75,7 @@ export const selectAction = async (object?: ObjectType): Promise<ActionType> => 
         value: "messages-stock",
       },
       {
-        name: "🪟 Message view",
+        name: "📁 Message view",
         value: "messages-view",
       },
       {
@@ -83,7 +83,7 @@ export const selectAction = async (object?: ObjectType): Promise<ActionType> => 
         value: "messages-search",
       },
       {
-        name: "⏲️  Message timer",
+        name: "⏰ Message timer",
         value: "messages-timer",
       },
     ],
@@ -94,7 +94,7 @@ export const selectAction = async (object?: ObjectType): Promise<ActionType> => 
         value: "data-fetch",
       },
       {
-        name: "🪟 Data view",
+        name: "📁 Data view",
         value: "data-view",
       },
     ],
@@ -105,7 +105,7 @@ export const selectAction = async (object?: ObjectType): Promise<ActionType> => 
         value: "teams-add",
       },
       {
-        name: "🪟 Team view",
+        name: "📁 Team view",
         value: "teams-view",
       },
     ],
@@ -140,7 +140,7 @@ export const selectOutputType = async (input?: OutputType): Promise<OutputType> 
       message: "What output type do you want to do?",
       choices: [
         {
-          name: "  Excel",
+          name: "📗 Excel",
           value: "xlsx",
         },
         {
@@ -189,6 +189,7 @@ export const selectTeam = async (input?: string): Promise<Team> => {
         name: team.team_name,
         value: team,
       })),
+      pageSize: Math.min(15, teams.length),
     },
   ]);
 
@@ -218,10 +219,16 @@ export const selectChannels = async (input?: string, team_id?: string): Promise<
       name: "channel",
       prefix: icon.question,
       message: "Select channel",
-      choices: channels.map((channel) => ({
-        name: `@${channel.team_name} ${channel.is_private ? "🔒" : "♯ "}${color.bold(channel.channel_name)}`,
-        value: channel,
-      })),
+      choices: [
+        ...channels.map((channel) => ({
+          name: `${color.dim(channel.team_name)} ${channel.is_private ? "🔒" : "♯ "}${color.bold(
+            channel.channel_name
+          )}`,
+          value: channel,
+        })),
+        new inquirer.Separator("===================================="),
+      ],
+      pageSize: Math.min(15, channels.length),
     },
   ]);
 

@@ -161,12 +161,12 @@ export const DB_CLIENT = {
             users
             LEFT OUTER JOIN teams
               ON users.team_id = teams.team_id
+          WHERE
+            users.deleted = 0
           ${
             params.team_id
               ? `
-          WHERE
-            users.team_id = @team_id
-          `
+            AND users.team_id = @team_id`
               : ""
           }
           ORDER BY
@@ -273,12 +273,12 @@ export const DB_CLIENT = {
             channels
             LEFT OUTER JOIN teams
               ON channels.team_id = teams.team_id
+          WHERE
+            channels.is_archived = 0
           ${
             params.team_id
               ? `
-          WHERE
-            channels.team_id = @team_id
-          `
+            AND channels.team_id = @team_id`
               : ""
           }
           ORDER BY
