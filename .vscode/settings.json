@@ -19,6 +19,9 @@
     "editor.tabSize": 2,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
   "[typescript]": {
     "editor.tabSize": 2,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
@@ -26,16 +29,12 @@
   "[markdown]": {
     "files.trimTrailingWhitespace": false
   },
-  "[vue]": {
-    "editor.tabSize": 2,
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "javascript.format.enable": false,
   "typescript.format.enable": false,
   "editor.formatOnSave": true,
-  "editor.rulers": [120],
-  "files.eol": "\n",
+  "editor.rulers": [100],
   "files.encoding": "utf8",
+  "files.eol": "\n",
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": true,
   "files.trimTrailingWhitespace": true

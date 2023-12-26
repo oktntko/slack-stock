@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node --require esbuild-register src/index.ts",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node"
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node",
+    "lint": "eslint --ext .js,.ts src",
+    "format": "prettier src --write"
   },
   "keywords": [],
   "author": "",
@@ -15,8 +17,15 @@
     "commander": "^11.1.0"
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
     "esbuild": "^0.19.10",
     "esbuild-register": "^3.5.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "prettier": "^3.1.1",
+    "prettier-plugin-organize-imports": "^3.2.4",
     "typescript": "^5.3.3"
   }
 }
