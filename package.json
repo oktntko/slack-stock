@@ -4,12 +4,19 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --require esbuild-register src/index.ts",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@commander-js/extra-typings": "^11.1.0",
     "commander": "^11.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.10",
+    "esbuild-register": "^3.5.0",
+    "typescript": "^5.3.3"
   }
 }
