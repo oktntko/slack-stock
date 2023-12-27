@@ -1,12 +1,25 @@
-import { Command } from '@commander-js/extra-typings';
+import { Option, program } from '@commander-js/extra-typings';
 
-const program = new Command()
-  .argument('<string>')
-  .option('--first')
-  .option('-s, --separator <char>')
-  .action((str, options) => {
-    const limit = options.first ? 1 : undefined;
-    console.log(str.split(options.separator ?? '/', limit));
+program.name('mygit').version('1.0.0');
+
+program
+  .command('clone')
+  .argument('<source>')
+  .argument('[destination]')
+  .option('--double-sided')
+  .addOption(new Option('--drink-size <size>').choices(['small', 'medium', 'large'] as const))
+  .description('clone a repository into a newly created directory')
+  .action((source, destination, options) => {
+    console.log('clone command called', source, destination, options);
   });
 
-program.parse();
+program
+  .command('pull')
+  .description('Fetch from and integrate with another repository or a local branch')
+  .action((source, destination) => {
+    console.log('pull command called', source, destination);
+  });
+
+program.parse(process.argv);
+
+export {};
