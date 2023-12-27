@@ -3,7 +3,7 @@
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./slack-stock.db"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
@@ -19,6 +19,7 @@ model Team {
   user    User[]
   channel Channel[]
   message Message[]
+
   @@map("teams")
 }
 
@@ -38,6 +39,7 @@ model User {
 
   team     Team      @relation(fields: [team_id], references: [team_id])
   messages Message[]
+
   @@map("users")
 }
 
@@ -60,6 +62,7 @@ model Channel {
 
   team     Team      @relation(fields: [team_id], references: [team_id])
   messages Message[]
+
   @@map("channels")
 }
 
@@ -78,6 +81,7 @@ model Message {
   team    Team    @relation(fields: [team_id], references: [team_id])
   channel Channel @relation(fields: [channel_id], references: [channel_id])
   user    User    @relation(fields: [user_id], references: [user_id])
+
   @@unique([team_id, channel_id, user_id, ts, type], name: "unique_message")
   @@map("messages")
 }

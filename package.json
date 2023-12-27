@@ -1,19 +1,24 @@
 {
   "name": "slack-stock",
-  "version": "1.0.0",
+  "version": "0.2.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node --require esbuild-register src/index.ts",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node --define:PUBLISH=true",
     "lint": "eslint --ext .js,.ts src",
-    "format": "prettier src --write"
+    "format": "prettier src --write",
+    "prisma": "npm-run-all --sequential prisma:*",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "node --require esbuild-register prisma/seed.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@commander-js/extra-typings": "^11.1.0",
+    "@prisma/client": "^5.7.1",
     "commander": "^11.1.0"
   },
   "devDependencies": {
@@ -25,8 +30,10 @@
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.2",
+    "npm-run-all": "^4.1.5",
     "prettier": "^3.1.1",
     "prettier-plugin-organize-imports": "^3.2.4",
+    "prisma": "^5.7.1",
     "typescript": "^5.3.3"
   }
 }
