@@ -6,6 +6,7 @@ import { SlackConversationsRepository } from '~/repository/SlackConversationsRep
 export const MessageService = {
   fetchMessage,
   listMessage,
+  listMessageByStopwatchKeyword,
 };
 
 async function fetchMessage(
@@ -47,4 +48,14 @@ async function listMessage(
   skip?: number,
 ) {
   return DatabaseMessageRepository.findManyMessage(where, orderBy, take, skip);
+}
+
+async function listMessageByStopwatchKeyword(where: {
+  channelIdList: string[];
+  from: Dayjs;
+  to: Dayjs;
+  startKeyword: string;
+  stopKeyword: string;
+}) {
+  return DatabaseMessageRepository.vFindManyMessageByStopwatchKeyword(where);
 }

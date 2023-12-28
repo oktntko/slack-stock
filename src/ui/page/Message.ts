@@ -7,11 +7,12 @@ import { Icon } from '~/ui//element/Icon';
 import { InputDate } from '~/ui/component/InputDate';
 import { SelectChannelList } from '~/ui/component/SelectChannelList';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
+import { InputText } from '../component/InputText';
 
 export const Message = {
   fetch,
   view,
-  timer,
+  stopwatch,
 };
 
 async function fetch(options: {
@@ -80,12 +81,6 @@ async function view(options: {
       ? await InputDate('Select period "to" date', dayjs())
       : dayjs();
 
-  const outputFormatType = options.output
-    ? options.output
-    : options.interactive
-      ? await SelectOutputFormatType()
-      : 'xlsx';
-
   const messageList = await MessageService.listMessage(
     {
       channel_id: { in: channelList.map((x) => x.channel_id) },
@@ -97,6 +92,12 @@ async function view(options: {
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
 
+  const outputFormatType = options.output
+    ? options.output
+    : options.interactive
+      ? await SelectOutputFormatType()
+      : 'xlsx';
+
   if (messageList.length > 0) {
     await output(outputFormatType, messageList, filepath('message', outputFormatType, from, to));
     console.log(Icon.success, 'Success!');
@@ -105,9 +106,9 @@ async function view(options: {
   }
 }
 
-async function timer(
-  startKeyword: string | undefined,
-  stopKeyword: string | undefined,
+async function stopwatch(
+  argStartKeyword: string | undefined,
+  argStopKeyword: string | undefined,
   options: {
     interactive: boolean;
     channelName?: string | undefined;
@@ -137,22 +138,22 @@ async function timer(
       ? await InputDate('Select period "to" date', dayjs())
       : dayjs();
 
+  const startKeyword = argStartKeyword ? argStartKeyword : await InputText('Enter start keyword');
+  const stopKeyword = argStopKeyword ? argStopKeyword : await InputText('Enter stop  keyword');
+
+  const messageList = await MessageService.listMessageByStopwatchKeyword({
+    channelIdList: channelList.map((x) => x.channel_id),
+    from,
+    to,
+    startKeyword,
+    stopKeyword,
+  });
+
   const outputFormatType = options.output
     ? options.output
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
-
-  const messageList = await MessageService.listMessage(
-    {
-      channel_id: { in: channelList.map((x) => x.channel_id) },
-      ts: {
-        gte: String(from.unix()),
-        lte: String(to.unix()),
-      },
-    },
-    [{ team_id: 'asc' }, { channel_id: 'asc' }],
-  );
 
   if (messageList.length > 0) {
     await output(outputFormatType, messageList, filepath('message', outputFormatType, from, to));

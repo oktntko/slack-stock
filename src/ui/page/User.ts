@@ -38,12 +38,6 @@ async function view(options: {
       ? await SelectTeamList(teamListAll)
       : teamListAll;
 
-  const outputFormatType = options.output
-    ? options.output
-    : options.interactive
-      ? await SelectOutputFormatType()
-      : 'xlsx';
-
   const userList = await UserService.listUser(
     {
       team_id: { in: teamList.map((x) => x.team_id) },
@@ -51,6 +45,12 @@ async function view(options: {
     },
     [{ team_id: 'asc' }, { is_admin: 'desc' }, { user_id: 'asc' }],
   );
+
+  const outputFormatType = options.output
+    ? options.output
+    : options.interactive
+      ? await SelectOutputFormatType()
+      : 'xlsx';
 
   if (userList.length > 0) {
     await output(outputFormatType, userList, filepath('user', outputFormatType));

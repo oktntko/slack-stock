@@ -16,6 +16,9 @@ program
   .alias('slst')
   .version('0.2.0');
 
+////////////////////////////////
+// menu
+////////////////////////////////
 program
   //
   .action(Menu.open)
@@ -37,49 +40,54 @@ program
   )
   .action(Menu.fetch);
 
-program
-  .command('team')
-  //
-  .command('add')
-  .argument('[token]', 'OAuth token installed your workspace')
-  .action(Team.add)
-  //
+////////////////////////////////
+// team
+////////////////////////////////
+const team = program.command('team');
+team.command('add').argument('[token]', 'OAuth token installed your workspace').action(Team.add);
+team
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .addOption(OUTPUT_OPTION)
   .action(Team.view);
 
-program
-  .command('user')
-  //
+////////////////////////////////
+// user
+////////////////////////////////
+const user = program.command('user');
+user
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
-  .action(User.fetch)
-  //
+  .action(User.fetch);
+user
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .addOption(OUTPUT_OPTION)
   .action(User.view);
 
-program
-  .command('channel')
-  //
+////////////////////////////////
+// channel
+////////////////////////////////
+const channel = program.command('channel');
+channel
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
-  .action(Channel.fetch)
-  //
+  .action(Channel.fetch);
+channel
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .addOption(OUTPUT_OPTION)
   .action(Channel.view);
 
-program
-  .command('message')
-  //
+////////////////////////////////
+// message
+////////////////////////////////
+const message = program.command('message');
+message
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
@@ -93,8 +101,8 @@ program
     'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
     validateAndParseDate,
   )
-  .action(Message.fetch)
-  //
+  .action(Message.fetch);
+message
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
@@ -109,8 +117,8 @@ program
     validateAndParseDate,
   )
   .addOption(OUTPUT_OPTION)
-  .action(Message.view)
-  //
+  .action(Message.view);
+message
   .command('stopwatch')
   .argument('[start keyword]', 'Enter start keyword. ex) --start-keyword="start".')
   .argument('[stop keyword]', 'Enter stop keyword. ex) --stop-keyword="stop".')
@@ -127,7 +135,7 @@ program
     validateAndParseDate,
   )
   .addOption(OUTPUT_OPTION)
-  .action(Message.timer);
+  .action(Message.stopwatch);
 
 function validateAndParseDate(value: string) {
   const day = dayjs(value, 'YYYY-MM-DD', true);

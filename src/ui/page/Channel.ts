@@ -38,12 +38,6 @@ async function view(options: {
       ? await SelectTeamList(teamListAll)
       : teamListAll;
 
-  const outputFormatType = options.output
-    ? options.output
-    : options.interactive
-      ? await SelectOutputFormatType()
-      : 'xlsx';
-
   const channelList = await ChannelService.listChannel(
     {
       team_id: { in: teamList.map((x) => x.team_id) },
@@ -51,6 +45,12 @@ async function view(options: {
     },
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
+
+  const outputFormatType = options.output
+    ? options.output
+    : options.interactive
+      ? await SelectOutputFormatType()
+      : 'xlsx';
 
   if (channelList.length > 0) {
     await output(outputFormatType, channelList, filepath('channel', outputFormatType));

@@ -38,13 +38,13 @@ async function add(argToken: string | undefined) {
 }
 
 async function view(options: { interactive: boolean; output?: OutputFormatType }) {
+  const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
+
   const outputFormatType = options.output
     ? options.output
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
-
-  const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
 
   if (teamList.length > 0) {
     await output(outputFormatType, teamList, filepath('team', outputFormatType));
