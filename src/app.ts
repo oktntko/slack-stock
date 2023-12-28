@@ -1,5 +1,6 @@
 import { Argument, Command } from '@commander-js/extra-typings';
-import { OUTPUT_OPTION } from './middleware/type';
+import { OUTPUT_OPTION } from '~/middleware/type';
+import { MenuService } from '~/service/MenuService';
 
 export const program = new Command();
 
@@ -9,9 +10,7 @@ program
   .alias('slst')
   .version('0.2.0');
 
-program.action(() => {
-  console.log('menu');
-});
+program.action(MenuService.selectCommand);
 
 program
   .command('teams')
