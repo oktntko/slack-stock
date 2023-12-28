@@ -1,6 +1,6 @@
 import { color } from '~/lib/color';
 
-export const icon = {
+export const Icon = {
   info: color.info('ℹ️ '),
   warn: color.warn('⚠️ '),
   error: color.error('❌'),

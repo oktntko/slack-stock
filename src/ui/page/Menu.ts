@@ -1,12 +1,12 @@
 import inquirer from 'inquirer';
 import { color } from '~/lib/color';
-import { icon } from '~/ui/elements/icon';
+import { Icon } from '~/ui/element/Icon';
 
-export const MenuService = {
-  selectCommand,
+export const Menu = {
+  open,
 };
 
-async function selectCommand() {
+export async function open() {
   for (;;) {
     const action = await selectAction();
     switch (action) {
@@ -89,7 +89,7 @@ async function selectAction() {
     {
       type: 'list',
       name: 'selection',
-      prefix: icon.question,
+      prefix: Icon.question,
       message: 'What do you want to do?',
       choices: ACTION_LIST,
       pageSize: ACTION_LIST.length,
@@ -104,7 +104,7 @@ export const selectContinue = async (): Promise<boolean> => {
     {
       type: 'confirm',
       name: 'confirm',
-      prefix: icon.question,
+      prefix: Icon.question,
       message: 'continue?',
       default: true,
     },

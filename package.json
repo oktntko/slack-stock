@@ -19,10 +19,13 @@
   "dependencies": {
     "@commander-js/extra-typings": "^11.1.0",
     "@prisma/client": "^5.7.1",
+    "@slack/web-api": "^6.11.0",
     "commander": "^11.1.0",
+    "dayjs": "^1.11.10",
     "inquirer": "^9.2.12",
     "inquirer-autocomplete-prompt": "^3.0.1",
-    "inquirer-date-prompt": "^3.0.0"
+    "inquirer-date-prompt": "^3.0.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",

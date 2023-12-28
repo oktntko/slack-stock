@@ -1,6 +1,7 @@
 import { Argument, Command } from '@commander-js/extra-typings';
 import { OUTPUT_OPTION } from '~/middleware/type';
-import { MenuService } from '~/service/MenuService';
+import { Menu } from '~/ui/page/Menu';
+import { Team } from '~/ui/page/Team';
 
 export const program = new Command();
 
@@ -10,16 +11,23 @@ program
   .alias('slst')
   .version('0.2.0');
 
-program.action(MenuService.selectCommand);
+program.action(Menu.open);
 
 program
   .command('teams')
   .aliases(['t', 'team'])
-  .addArgument(new Argument('<action>').choices(['add', 'view']))
+  .addArgument(new Argument('<action>').choices(['add', 'view'] as const))
   .option('-t, --token <token>', 'OAuth token installed your workspace')
   .addOption(OUTPUT_OPTION)
-  .action((action, options) => {
-    console.log('teams', action, options);
+  .action(async (action, options) => {
+    switch (action) {
+      case 'add': {
+        return Team.add(options);
+      }
+      case 'view': {
+        return Team.view(options);
+      }
+    }
   });
 
 program

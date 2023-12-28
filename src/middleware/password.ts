@@ -16,22 +16,18 @@ const PASSWORD = fs.readFileSync(PASSWORD_PATH, 'utf8');
 ////////////////////////////////
 // 暗号化・複合化
 ////////////////////////////////
-export const PasswordRepository = {
-  encrypt,
-  decrypt,
-};
 
 const ALGORITHM = 'aes-256-ctr';
 const IV_LENGTH = 16;
 
-function encrypt(text: string, key = PASSWORD) {
+export function encrypt(text: string, key = PASSWORD) {
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
 
   return Buffer.concat([iv, cipher.update(Buffer.from(text)), cipher.final()]).toString('base64');
 }
 
-function decrypt(data: string, key = PASSWORD) {
+export function decrypt(data: string, key = PASSWORD) {
   const buff = Buffer.from(data, 'base64');
 
   const iv = buff.subarray(0, IV_LENGTH);
