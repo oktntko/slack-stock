@@ -1,5 +1,4 @@
-import { Command, Option } from '@commander-js/extra-typings';
-import commander from 'commander';
+import { Command, InvalidArgumentError, Option } from '@commander-js/extra-typings';
 import dayjs from 'dayjs';
 import { Channel } from '~/ui/page/Channel';
 import { Menu } from '~/ui/page/Menu';
@@ -18,7 +17,7 @@ program
   .name('slack-stock')
   .description('CLI to stock Slack data in your DB (SQLite).')
   .alias('slst')
-  .version('0.2.0');
+  .version('0.2.3');
 
 ////////////////////////////////
 // menu
@@ -159,7 +158,7 @@ message.command('search').action(Message.search);
 function validateAndParseDate(value: string) {
   const day = dayjs(value, 'YYYY-MM-DD', true);
   if (day.isValid()) {
-    throw new commander.InvalidArgumentError('Got Invalid date. value=' + value);
+    throw new InvalidArgumentError('Got Invalid date. value=' + value);
   }
   return day;
 }
