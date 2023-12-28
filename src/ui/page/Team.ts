@@ -41,7 +41,7 @@ async function add(options: { token?: string | undefined }) {
 async function view(options: { output?: OutputFormatType }) {
   const outputFormatType = options.output ? options.output : await SelectOutputFormatType();
 
-  const teamList = await TeamService.listTeam();
+  const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
 
   if (teamList.length > 0) {
     await output(outputFormatType, teamList, filepath('team', outputFormatType));
