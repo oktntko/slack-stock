@@ -1,4 +1,4 @@
-import { Argument, Command } from '@commander-js/extra-typings';
+import { Command } from '@commander-js/extra-typings';
 import commander from 'commander';
 import dayjs from 'dayjs';
 import { OUTPUT_OPTION } from '~/middleware/type';
@@ -20,77 +20,47 @@ program.action(Menu.open);
 
 program
   .command('team')
-  .aliases(['t', 'teams'])
-  .addArgument(new Argument('<action>').choices(['add', 'view'] as const))
+  .command('add')
+  .option('-t, --token <token>', 'OAuth token installed your workspace')
+  .action(Team.add)
+  .command('view')
   .option('-t, --token <token>', 'OAuth token installed your workspace')
   .addOption(OUTPUT_OPTION)
-  .action(async (action, options) => {
-    switch (action) {
-      case 'add': {
-        return Team.add(options);
-      }
-      case 'view': {
-        return Team.view(options);
-      }
-    }
-  });
+  .action(Team.view);
 
 program
   .command('user')
-  .aliases(['u', 'users'])
-  .addArgument(new Argument('<action>').choices(['fetch', 'view'] as const))
+  .command('fetch')
+  .option('-t, --team-name <team name>', 'Enter team name')
+  .action(User.fetch)
+  .command('view')
   .option('-t, --team-name <team name>', 'Enter team name')
   .addOption(OUTPUT_OPTION)
-  .action(async (action, options) => {
-    switch (action) {
-      case 'fetch': {
-        return User.fetch(options);
-      }
-      case 'view': {
-        return User.view(options);
-      }
-    }
-  });
+  .action(User.view);
 
 program
   .command('channel')
-  .aliases(['c', 'channels'])
-  .addArgument(new Argument('<action>').choices(['fetch', 'view'] as const))
+  .command('fetch')
+  .option('-t, --team-name <team name>', 'Enter team name')
+  .action(Channel.fetch)
+  .command('view')
   .option('-t, --team-name <team name>', 'Enter team name')
   .addOption(OUTPUT_OPTION)
-  .action(async (action, options) => {
-    switch (action) {
-      case 'fetch': {
-        return Channel.fetch(options);
-      }
-      case 'view': {
-        return Channel.view(options);
-      }
-    }
-  });
+  .action(Channel.view);
 
 program
   .command('message')
-  .aliases(['m', 'messages'])
-  .addArgument(new Argument('<action>').choices(['fetch', 'view'] as const))
+  .command('fetch')
   .option('-c, --channel-name <channel name>', 'Enter channel name')
-  .option(
-    '-f, --from <from>',
-    'Enter period from. ex) --period="YYYY-MM-DD".',
-    validateAndParseDate,
-  )
-  .option('-t, --to <to>', 'Enter period to. ex) --period="YYYY-MM-DD".', validateAndParseDate)
+  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
+  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
+  .action(Message.fetch)
+  .command('view')
+  .option('-c, --channel-name <channel name>', 'Enter channel name')
+  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
+  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
   .addOption(OUTPUT_OPTION)
-  .action((action, options) => {
-    switch (action) {
-      case 'fetch': {
-        return Message.fetch(options);
-      }
-      case 'view': {
-        return Message.view(options);
-      }
-    }
-  });
+  .action(Message.view);
 
 program
   .command('fetch')
