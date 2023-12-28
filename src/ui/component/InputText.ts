@@ -2,14 +2,14 @@ import inquirer from 'inquirer';
 import { Icon } from '~/ui/element/Icon';
 
 export async function InputText(message: string) {
-  const { keyword } = await inquirer.prompt<{ keyword: string }>([
+  const { input } = await inquirer.prompt<{ input: string }>([
     {
       type: 'input',
-      name: 'keyword',
+      name: 'input',
       prefix: Icon.question,
       message,
     },
   ]);
 
-  return keyword;
+  return input;
 }

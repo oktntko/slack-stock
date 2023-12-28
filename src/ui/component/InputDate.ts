@@ -3,10 +3,10 @@ import inquirer from 'inquirer';
 import { Icon } from '~/ui/element/Icon';
 
 export async function InputDate(message: string, initialiValue: Dayjs) {
-  const { selection } = await inquirer.prompt<{ selection: Dayjs }>([
+  const { date } = await inquirer.prompt<{ date: Dayjs }>([
     {
       type: 'date',
-      name: 'selection',
+      name: 'date',
       prefix: Icon.question,
       message: message,
       default: initialiValue.toDate(),
@@ -23,5 +23,5 @@ export async function InputDate(message: string, initialiValue: Dayjs) {
     },
   ]);
 
-  return selection;
+  return date;
 }

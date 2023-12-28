@@ -1,6 +1,7 @@
 import { type Dayjs } from 'dayjs';
 import inquirer from 'inquirer';
 import { color } from '~/lib/color';
+import { Confirm } from '~/ui/component/Confirm';
 import { Icon } from '~/ui/element/Icon';
 import { Channel } from '~/ui/page/Channel';
 import { Message } from '~/ui/page/Message';
@@ -41,7 +42,7 @@ async function open() {
         break;
     }
 
-    if (!(await selectContinue())) {
+    if (!(await Confirm('continue?'))) {
       console.log(color.info('👋 Bye!'));
       break;
     }
@@ -104,21 +105,8 @@ async function selectAction() {
   return selection;
 }
 
-const selectContinue = async (): Promise<boolean> => {
-  const { confirm } = await inquirer.prompt([
-    {
-      type: 'confirm',
-      name: 'confirm',
-      prefix: Icon.question,
-      message: 'continue?',
-      default: true,
-    },
-  ]);
-
-  return confirm;
-};
-
 async function fetch(options: {
+  interactive: boolean;
   teamName?: string | undefined;
   channelName?: string | undefined;
   from?: Dayjs | undefined;

@@ -11,13 +11,12 @@ export const Team = {
   view,
 };
 
-async function add(options: { token?: string | undefined }) {
+async function add(argToken: string | undefined) {
   // token が入力されていない場合、token の取得方法を表示する
-  const token = options.token
-    ? options.token
+  const token = argToken
+    ? argToken
     : await (async () => {
         console.info('📥 Please setup slack app and copy token');
-
         console.info(color.link('https://github.com/oktntko/slack-stock#setup-slack-app'));
 
         return InputText('What is your token?');
@@ -38,8 +37,12 @@ async function add(options: { token?: string | undefined }) {
   );
 }
 
-async function view(options: { output?: OutputFormatType }) {
-  const outputFormatType = options.output ? options.output : await SelectOutputFormatType();
+async function view(options: { interactive: boolean; output?: OutputFormatType }) {
+  const outputFormatType = options.output
+    ? options.output
+    : options.interactive
+      ? await SelectOutputFormatType()
+      : 'xlsx';
 
   const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
 

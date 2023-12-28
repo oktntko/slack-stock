@@ -3,10 +3,10 @@ import { OutputFormatType } from '~/middleware/type';
 import { Icon } from '~/ui/element/Icon';
 
 export async function SelectOutputFormatType() {
-  const { selection } = await inquirer.prompt<{ selection: OutputFormatType }>([
+  const { list } = await inquirer.prompt<{ list: OutputFormatType }>([
     {
       type: 'list',
-      name: 'selection',
+      name: 'list',
       prefix: Icon.question,
       message: 'What output type do you want to do?',
       choices: [
@@ -26,5 +26,5 @@ export async function SelectOutputFormatType() {
     },
   ]);
 
-  return selection;
+  return list;
 }

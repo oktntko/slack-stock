@@ -3,6 +3,7 @@ import { OutputFormatType } from '~/middleware/type';
 import { ChannelService } from '~/service/ChannelService';
 import { TeamService } from '~/service/TeamService';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
+import { SelectTeamList } from '~/ui/component/SelectTeamList';
 import { Icon } from '~/ui/element/Icon';
 
 export const Channel = {
@@ -10,10 +11,13 @@ export const Channel = {
   view,
 };
 
-async function fetch(options: { teamName?: string | undefined }) {
-  const teamList = await TeamService.listTeam({ team_name: options.teamName }, [
-    { team_id: 'asc' },
-  ]);
+async function fetch(options: { interactive: boolean; teamName?: string | undefined }) {
+  const teamListAll = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
+  const teamList = options.teamName
+    ? teamListAll.filter((team) => team.team_name === options.teamName)
+    : options.interactive
+      ? await SelectTeamList(teamListAll)
+      : teamListAll;
 
   for (const { token } of teamList) {
     await ChannelService.fetchChannel(token);
@@ -22,12 +26,23 @@ async function fetch(options: { teamName?: string | undefined }) {
   console.log(Icon.done, 'Success!');
 }
 
-async function view(options: { teamName?: string | undefined; output?: OutputFormatType }) {
-  const teamList = await TeamService.listTeam({ team_name: options.teamName }, [
-    { team_id: 'asc' },
-  ]);
+async function view(options: {
+  interactive: boolean;
+  teamName?: string | undefined;
+  output?: OutputFormatType;
+}) {
+  const teamListAll = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
+  const teamList = options.teamName
+    ? teamListAll.filter((team) => team.team_name === options.teamName)
+    : options.interactive
+      ? await SelectTeamList(teamListAll)
+      : teamListAll;
 
-  const outputFormatType = options.output ? options.output : await SelectOutputFormatType();
+  const outputFormatType = options.output
+    ? options.output
+    : options.interactive
+      ? await SelectOutputFormatType()
+      : 'xlsx';
 
   const channelList = await ChannelService.listChannel(
     {

@@ -22,21 +22,30 @@ program
   //
   .command('fetch')
   .alias('f')
-  .option('-t, --team-name <team name>', 'Enter team name')
-  .option('-c, --channel-name <channel name>', 'Enter channel name')
-  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
-  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
+  .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
+  .option(
+    '-f, --from <from>',
+    'Enter period from. e.g. --from="YYYY-MM-DD". (default: 1st day one month ago from yesterday)',
+    validateAndParseDate,
+  )
+  .option(
+    '-t, --to <to>',
+    'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
+    validateAndParseDate,
+  )
   .action(Menu.fetch);
 
 program
   .command('team')
   //
   .command('add')
-  .option('-t, --token <token>', 'OAuth token installed your workspace')
+  .argument('[token]', 'OAuth token installed your workspace')
   .action(Team.add)
   //
   .command('view')
-  .option('-t, --token <token>', 'OAuth token installed your workspace')
+  .option('--no-interactive', 'If option is not set, default option enable.')
   .addOption(OUTPUT_OPTION)
   .action(Team.view);
 
@@ -44,11 +53,13 @@ program
   .command('user')
   //
   .command('fetch')
-  .option('-t, --team-name <team name>', 'Enter team name')
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .action(User.fetch)
   //
   .command('view')
-  .option('-t, --team-name <team name>', 'Enter team name')
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .addOption(OUTPUT_OPTION)
   .action(User.view);
 
@@ -56,11 +67,13 @@ program
   .command('channel')
   //
   .command('fetch')
-  .option('-t, --team-name <team name>', 'Enter team name')
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .action(Channel.fetch)
   //
   .command('view')
-  .option('-t, --team-name <team name>', 'Enter team name')
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .addOption(OUTPUT_OPTION)
   .action(Channel.view);
 
@@ -68,17 +81,53 @@ program
   .command('message')
   //
   .command('fetch')
-  .option('-c, --channel-name <channel name>', 'Enter channel name')
-  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
-  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
+  .option(
+    '-f, --from <from>',
+    'Enter period from. e.g. --from="YYYY-MM-DD". (default: 1st day one month ago from yesterday)',
+    validateAndParseDate,
+  )
+  .option(
+    '-t, --to <to>',
+    'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
+    validateAndParseDate,
+  )
   .action(Message.fetch)
   //
   .command('view')
-  .option('-c, --channel-name <channel name>', 'Enter channel name')
-  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
-  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
+  .option(
+    '-f, --from <from>',
+    'Enter period from. e.g. --from="YYYY-MM-DD". (default: 1st day one month ago from yesterday)',
+    validateAndParseDate,
+  )
+  .option(
+    '-t, --to <to>',
+    'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
+    validateAndParseDate,
+  )
   .addOption(OUTPUT_OPTION)
-  .action(Message.view);
+  .action(Message.view)
+  //
+  .command('stopwatch')
+  .argument('[start keyword]', 'Enter start keyword. ex) --start-keyword="start".')
+  .argument('[stop keyword]', 'Enter stop keyword. ex) --stop-keyword="stop".')
+  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
+  .option(
+    '-f, --from <from>',
+    'Enter period from. e.g. --from="YYYY-MM-DD". (default: 1st day one month ago from yesterday)',
+    validateAndParseDate,
+  )
+  .option(
+    '-t, --to <to>',
+    'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
+    validateAndParseDate,
+  )
+  .addOption(OUTPUT_OPTION)
+  .action(Message.timer);
 
 function validateAndParseDate(value: string) {
   const day = dayjs(value, 'YYYY-MM-DD', true);
