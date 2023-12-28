@@ -1,81 +1,47 @@
 {
   "name": "slack-stock",
-  "version": "0.1.2",
-  "bin": {
-    "slst": "./bin/run"
-  },
-  "bugs": "https://github.com/oktntko/slack-stock/issues",
-  "devDependencies": {
-    "@oclif/dev-cli": "^1.26.0",
-    "@oclif/test": "^1.2.8",
-    "@prisma/client": "^3.4.1",
-    "@types/better-sqlite3": "^7.4.0",
-    "@types/inquirer": "^8.1.3",
-    "@types/inquirer-autocomplete-prompt": "^1.3.3",
-    "@types/jest": "^27.0.2",
-    "@types/node": "^10.17.60",
-    "@types/papaparse": "^5.3.1",
-    "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "eslint": "^8.2.0",
-    "eslint-config-prettier": "^8.3.0",
-    "globby": "^10.0.2",
-    "jest": "^27.3.1",
-    "prisma": "^3.4.1",
-    "ts-jest": "^27.0.7",
-    "ts-node": "^8.10.2",
-    "typescript": "^4.4.4"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/oktntko/slack-stock",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "slst",
-    "plugins": [
-      "@oclif/plugin-help"
-    ]
-  },
-  "repository": "oktntko/slack-stock",
+  "version": "0.2.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "postpack": "rm -f oclif.manifest.json",
-    "posttest": "eslint ./src --ext .ts --config .eslintrc.yml",
-    "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "jest",
-    "version": "oclif-dev readme && git add README.md",
-    "start": "./bin/run",
-    "migrate": "prisma migrate dev",
-    "seed": "prisma db seed"
+    "start": "node --require esbuild-register src/index.ts",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node --define:SLACK_STOCK_PUBLISH=true",
+    "lint": "eslint --ext .js,.ts src",
+    "format": "prettier src --write",
+    "prisma": "npm-run-all --sequential prisma:*",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "node --require esbuild-register prisma/seed.ts"
   },
-  "types": "lib/index.d.ts",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
-    "@oclif/command": "^1.8.0",
-    "@oclif/config": "^1.17.0",
-    "@oclif/plugin-help": "^3.2.3",
-    "@slack/web-api": "^6.4.0",
-    "better-sqlite3-helper": "^3.1.5",
-    "cli-ux": "^5.6.3",
-    "dayjs": "^1.10.7",
-    "inquirer": "^8.2.0",
-    "inquirer-autocomplete-prompt": "^1.4.0",
-    "inquirer-date-prompt": "^2.0.1",
-    "kleur": "^4.1.4",
-    "papaparse": "^5.3.1",
-    "tslib": "^1.14.1",
-    "xlsx": "^0.17.3"
+    "@commander-js/extra-typings": "^11.1.0",
+    "@prisma/client": "^5.7.1",
+    "@slack/web-api": "^6.11.0",
+    "commander": "^11.1.0",
+    "dayjs": "^1.11.10",
+    "inquirer": "^9.2.12",
+    "inquirer-autocomplete-standalone": "^0.8.1",
+    "inquirer-date-prompt": "^3.0.0",
+    "loading-cli": "^1.1.2",
+    "xlsx": "^0.18.5"
   },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "esbuild": "^0.19.10",
+    "esbuild-register": "^3.5.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.2",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.1.1",
+    "prettier-plugin-organize-imports": "^3.2.4",
+    "prisma": "^5.7.1",
+    "typescript": "^5.3.3"
   }
 }
