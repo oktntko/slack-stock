@@ -59,3 +59,5 @@ async function view(options: {
     console.log(Icon.error, 'No data.');
   }
 }
+
+// TODO option 確認、 interactive 確認、 入力コンポーネント表示 が長い

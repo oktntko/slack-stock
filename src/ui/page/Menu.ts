@@ -49,6 +49,7 @@ async function open() {
   }
 }
 
+// TODO コンポーネントに移動する
 async function selectAction() {
   const ACTION_LIST = [
     // new inquirer.Separator('== 💬 Messages ========================='),
