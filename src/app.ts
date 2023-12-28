@@ -1,5 +1,6 @@
 import { Argument, Command } from '@commander-js/extra-typings';
 import { OUTPUT_OPTION } from '~/middleware/type';
+import { Channel } from '~/ui/page/Channel';
 import { Menu } from '~/ui/page/Menu';
 import { Team } from '~/ui/page/Team';
 import { User } from '~/ui/page/User';
@@ -44,6 +45,23 @@ program
       }
       case 'view': {
         return User.view(options);
+      }
+    }
+  });
+
+program
+  .command('channel')
+  .aliases(['c', 'channels'])
+  .addArgument(new Argument('<action>').choices(['fetch', 'view'] as const))
+  .option('-t, --team-name <team name>', 'Enter team name')
+  .addOption(OUTPUT_OPTION)
+  .action(async (action, options) => {
+    switch (action) {
+      case 'fetch': {
+        return Channel.fetch(options);
+      }
+      case 'view': {
+        return Channel.view(options);
       }
     }
   });
