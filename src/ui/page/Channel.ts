@@ -1,11 +1,11 @@
 import { filepath, output } from '~/middleware/output';
 import { OutputFormatType } from '~/middleware/type';
+import { ChannelService } from '~/service/ChannelService';
 import { TeamService } from '~/service/TeamService';
-import { UserService } from '~/service/UserService';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
 import { Icon } from '~/ui/element/Icon';
 
-export const User = {
+export const Channel = {
   fetch,
   view,
 };
@@ -16,7 +16,7 @@ async function fetch(options: { teamName?: string | undefined }) {
   ]);
 
   for (const { token } of teamList) {
-    await UserService.fetchUser(token);
+    await ChannelService.fetchChannel(token);
   }
 
   console.log(Icon.done, 'Success!');
@@ -29,16 +29,16 @@ async function view(options: { teamName?: string | undefined; output?: OutputFor
 
   const outputFormatType = options.output ? options.output : await SelectOutputFormatType();
 
-  const userList = await UserService.listUser(
+  const channelList = await ChannelService.listChannel(
     {
       team_id: { in: teamList.map((x) => x.team_id) },
-      deleted: 0,
+      is_archived: 0,
     },
-    [{ team_id: 'asc' }, { is_admin: 'desc' }, { user_id: 'asc' }],
+    [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
 
-  if (userList.length > 0) {
-    await output(outputFormatType, userList, filepath('user', outputFormatType));
+  if (channelList.length > 0) {
+    await output(outputFormatType, channelList, filepath('channel', outputFormatType));
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

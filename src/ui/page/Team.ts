@@ -5,7 +5,6 @@ import { TeamService } from '~/service/TeamService';
 import { InputKeyword } from '~/ui//component/InputKeyword';
 import { Icon } from '~/ui/element/Icon';
 import { SelectOutputFormatType } from '../component/SelectOutputFormatType';
-import { Message } from '../element/Message';
 
 export const Team = {
   add,
@@ -31,8 +30,9 @@ async function add(options: { token?: string | undefined }) {
   // TODO
   // await COMMANDS.data.fetch(team);
 
-  console.info(
-    `${Icon.done} Finish! Have a great Slack Life with slack-stock! Try to command "${color.info(
+  console.log(
+    Icon.done,
+    `Finish! Have a great Slack Life with slack-stock! Try to command "${color.info(
       'slst messages stock',
     )}", next "${color.info('slst messages view')}"".`,
   );
@@ -45,8 +45,8 @@ async function view(options: { output?: OutputFormatType }) {
 
   if (teamList.length > 0) {
     await output(outputFormatType, teamList, filepath('team', outputFormatType));
-    console.log(Message.success);
+    console.log(Icon.success, 'Success!');
   } else {
-    console.log(Message.no_data);
+    console.log(Icon.error, 'No data.');
   }
 }

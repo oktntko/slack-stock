@@ -34,11 +34,11 @@ async function findUniqueChannel(where: Prisma.ChannelWhereUniqueInput) {
   });
 }
 
-async function upsertChannel(channel: Channel & { team_id: string }) {
+async function upsertChannel(channel: Channel) {
   return prisma.channel.upsert({
     create: {
       channel_id: channel.id!,
-      team_id: channel.team_id,
+      team_id: channel.context_team_id!,
       channel_name: channel.name!,
       is_channel: Number(channel.is_channel),
       is_group: Number(channel.is_group),
@@ -54,7 +54,7 @@ async function upsertChannel(channel: Channel & { team_id: string }) {
     },
     update: {
       channel_id: channel.id!,
-      team_id: channel.team_id,
+      team_id: channel.context_team_id!,
       channel_name: channel.name!,
       is_channel: Number(channel.is_channel),
       is_group: Number(channel.is_group),
