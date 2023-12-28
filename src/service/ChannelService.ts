@@ -10,7 +10,9 @@ export const ChannelService = {
 async function fetchChannel(token: string) {
   const channelList = await SlackConversationsRepository.list(token);
 
-  return channelList.map((channel) => DatabaseChannelRepository.upsertChannel(channel));
+  return Promise.all(
+    channelList.map((channel) => DatabaseChannelRepository.upsertChannel(channel)),
+  );
 }
 
 async function listChannel(

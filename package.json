@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node --require esbuild-register src/index.ts",
-    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node --define:PUBLISH=true",
+    "build": "esbuild src/index.ts --bundle --minify --sourcemap --outdir=dist --platform=node --define:SLACK_STOCK_PUBLISH=true",
     "lint": "eslint --ext .js,.ts src",
     "format": "prettier src --write",
     "prisma": "npm-run-all --sequential prisma:*",

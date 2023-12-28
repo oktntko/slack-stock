@@ -1,12 +1,17 @@
+import { type Dayjs } from 'dayjs';
 import inquirer from 'inquirer';
 import { color } from '~/lib/color';
 import { Icon } from '~/ui/element/Icon';
+import { Channel } from '~/ui/page/Channel';
+import { Message } from '~/ui/page/Message';
+import { User } from '~/ui/page/User';
 
 export const Menu = {
   open,
+  fetch,
 };
 
-export async function open() {
+async function open() {
   for (;;) {
     const action = await selectAction();
     switch (action) {
@@ -99,7 +104,7 @@ async function selectAction() {
   return selection;
 }
 
-export const selectContinue = async (): Promise<boolean> => {
+const selectContinue = async (): Promise<boolean> => {
   const { confirm } = await inquirer.prompt([
     {
       type: 'confirm',
@@ -112,3 +117,14 @@ export const selectContinue = async (): Promise<boolean> => {
 
   return confirm;
 };
+
+async function fetch(options: {
+  teamName?: string | undefined;
+  channelName?: string | undefined;
+  from?: Dayjs | undefined;
+  to?: Dayjs | undefined;
+}) {
+  await Channel.fetch(options);
+  await User.fetch(options);
+  await Message.fetch(options);
+}

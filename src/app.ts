@@ -16,13 +16,25 @@ program
   .alias('slst')
   .version('0.2.0');
 
-program.action(Menu.open);
+program
+  //
+  .action(Menu.open)
+  //
+  .command('fetch')
+  .alias('f')
+  .option('-t, --team-name <team name>', 'Enter team name')
+  .option('-c, --channel-name <channel name>', 'Enter channel name')
+  .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
+  .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
+  .action(Menu.fetch);
 
 program
   .command('team')
+  //
   .command('add')
   .option('-t, --token <token>', 'OAuth token installed your workspace')
   .action(Team.add)
+  //
   .command('view')
   .option('-t, --token <token>', 'OAuth token installed your workspace')
   .addOption(OUTPUT_OPTION)
@@ -30,9 +42,11 @@ program
 
 program
   .command('user')
+  //
   .command('fetch')
   .option('-t, --team-name <team name>', 'Enter team name')
   .action(User.fetch)
+  //
   .command('view')
   .option('-t, --team-name <team name>', 'Enter team name')
   .addOption(OUTPUT_OPTION)
@@ -40,9 +54,11 @@ program
 
 program
   .command('channel')
+  //
   .command('fetch')
   .option('-t, --team-name <team name>', 'Enter team name')
   .action(Channel.fetch)
+  //
   .command('view')
   .option('-t, --team-name <team name>', 'Enter team name')
   .addOption(OUTPUT_OPTION)
@@ -50,32 +66,19 @@ program
 
 program
   .command('message')
+  //
   .command('fetch')
   .option('-c, --channel-name <channel name>', 'Enter channel name')
   .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
   .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
   .action(Message.fetch)
+  //
   .command('view')
   .option('-c, --channel-name <channel name>', 'Enter channel name')
   .option('-f, --from <from>', 'Enter period from. ex) --from="YYYY-MM-DD".', validateAndParseDate)
   .option('-t, --to <to>', 'Enter period to. ex) --to="YYYY-MM-DD".', validateAndParseDate)
   .addOption(OUTPUT_OPTION)
   .action(Message.view);
-
-program
-  .command('fetch')
-  .alias('f')
-  .option('-t, --team-name <team name>', 'Enter team name')
-  .action(async (action, options) => {
-    // switch (action) {
-    //   case 'fetch': {
-    //     return Team.add(options);
-    //   }
-    //   case 'view': {
-    //     return Team.view(options);
-    //   }
-    // }
-  });
 
 function validateAndParseDate(value: string) {
   const day = dayjs(value, 'YYYY-MM-DD', true);

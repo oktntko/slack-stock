@@ -18,6 +18,7 @@ export async function output(format: OutputFormatType, values: object[], filePat
 }
 
 function writeFile(bookType: 'csv' | 'xlsx', values: object[], filePath: string) {
+  // TODO: nested property
   const data = [Object.keys(values[0]), ...values.map((v) => Object.values(v))];
   const workbook = xlsx.utils.book_new();
   const worksheet = xlsx.utils.aoa_to_sheet(data);

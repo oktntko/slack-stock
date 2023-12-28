@@ -1,3 +1,3 @@
 export const env = {
-  SLACK_STOKC_PUBLISH: !!process.env.SLACK_STOKC_PUBLISH,
+  SLACK_STOCK_PUBLISH: !!process.env.SLACK_STOCK_PUBLISH,
 } as const;

@@ -10,7 +10,7 @@ export const UserService = {
 async function fetchUser(token: string) {
   const memberList = await SlackUsersRepository.list(token);
 
-  return memberList.map((member) => DatabaseUserRepository.upsertUser(member));
+  return Promise.all(memberList.map((member) => DatabaseUserRepository.upsertUser(member)));
 }
 
 async function listUser(
