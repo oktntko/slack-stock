@@ -1,5 +1,4 @@
-import type { Dayjs } from 'dayjs';
-import dayjs from 'dayjs';
+import dayjs, { type Dayjs } from 'dayjs';
 import os from 'os';
 import path from 'path';
 import xlsx from 'xlsx';

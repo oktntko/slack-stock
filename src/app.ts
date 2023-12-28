@@ -1,7 +1,10 @@
 import { Argument, Command } from '@commander-js/extra-typings';
+import commander from 'commander';
+import dayjs from 'dayjs';
 import { OUTPUT_OPTION } from '~/middleware/type';
 import { Channel } from '~/ui/page/Channel';
 import { Menu } from '~/ui/page/Menu';
+import { Message } from '~/ui/page/Message';
 import { Team } from '~/ui/page/Team';
 import { User } from '~/ui/page/User';
 
@@ -69,16 +72,24 @@ program
 program
   .command('message')
   .aliases(['m', 'messages'])
+  .addArgument(new Argument('<action>').choices(['fetch', 'view'] as const))
   .option('-c, --channel-name <channel name>', 'Enter channel name')
-  .option('-d, --day', 'If this flag ON, period is from one day ago to now.')
-  .option('-w, --week', 'If this flag ON, period is from one week ago to now.')
-  .option('-m, --month', 'If this flag ON, period is from one month ago to now.')
-  .option('-pf, --period-from <from>', 'Enter period from. ex) --period="YYYY-MM-DD".')
-  .option('-pt, --period-to <to>', 'Enter period to. ex) --period="YYYY-MM-DD".')
-  .option('-k, --keyword <keyword>', 'Enter timer keyword. ex) --keyword="start" "stop".')
+  .option(
+    '-f, --from <from>',
+    'Enter period from. ex) --period="YYYY-MM-DD".',
+    validateAndParseDate,
+  )
+  .option('-t, --to <to>', 'Enter period to. ex) --period="YYYY-MM-DD".', validateAndParseDate)
   .addOption(OUTPUT_OPTION)
-  .action((options) => {
-    console.log('messages', options);
+  .action((action, options) => {
+    switch (action) {
+      case 'fetch': {
+        return Message.fetch(options);
+      }
+      case 'view': {
+        return Message.view(options);
+      }
+    }
   });
 
 program
@@ -95,3 +106,11 @@ program
     //   }
     // }
   });
+
+function validateAndParseDate(value: string) {
+  const day = dayjs(value, 'YYYY-MM-DD', true);
+  if (day.isValid()) {
+    throw new commander.InvalidArgumentError('Got Invalid date. value=' + value);
+  }
+  return day;
+}

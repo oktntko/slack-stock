@@ -2,9 +2,9 @@ import { color } from '~/lib/color';
 import { filepath, output } from '~/middleware/output';
 import { OutputFormatType } from '~/middleware/type';
 import { TeamService } from '~/service/TeamService';
-import { InputKeyword } from '~/ui//component/InputKeyword';
+import { InputText } from '~/ui//component/InputText';
+import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
 import { Icon } from '~/ui/element/Icon';
-import { SelectOutputFormatType } from '../component/SelectOutputFormatType';
 
 export const Team = {
   add,
@@ -20,7 +20,7 @@ async function add(options: { token?: string | undefined }) {
 
         console.info(color.link('https://github.com/oktntko/slack-stock#setup-slack-app'));
 
-        return InputKeyword('What is your token?');
+        return InputText('What is your token?');
       })();
 
   // Team を登録する

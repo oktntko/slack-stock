@@ -5,6 +5,7 @@ export const SlackUsersRepository = {
   list,
 };
 
+// https://api.slack.com/methods/users.list
 async function list(token: string) {
   const members: Member[] = [];
 

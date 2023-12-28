@@ -4,6 +4,7 @@ export const SlackTeamRepository = {
   info,
 };
 
+// https://api.slack.com/methods/team.info
 async function info(token: string) {
   const res = await slack.team.info({ token });
 
