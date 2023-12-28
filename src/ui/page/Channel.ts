@@ -1,3 +1,4 @@
+import { $loading } from '~/lib/loading';
 import { filepath, output } from '~/middleware/output';
 import { ChannelService } from '~/service/ChannelService';
 import { TeamService } from '~/service/TeamService';
@@ -18,9 +19,11 @@ async function fetch(options: { interactive: boolean; teamName?: string | undefi
       ? await SelectTeamList(teamListAll)
       : teamListAll;
 
+  const loading = $loading.start();
   for (const { token } of teamList) {
     await ChannelService.fetchChannel(token);
   }
+  loading.stop();
 
   console.log(Icon.done, 'Success!');
 }
@@ -37,6 +40,7 @@ async function view(options: {
       ? await SelectTeamList(teamListAll)
       : teamListAll;
 
+  const loading = $loading.start();
   const channelList = await ChannelService.listChannel(
     {
       team_id: { in: teamList.map((x) => x.team_id) },
@@ -44,6 +48,7 @@ async function view(options: {
     },
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
+  loading.stop();
 
   const outputFormat = options.outputFormat
     ? options.outputFormat
@@ -52,7 +57,9 @@ async function view(options: {
       : 'xlsx';
 
   if (channelList.length > 0) {
+    const loading = $loading.start();
     await output(outputFormat, channelList, filepath('channel', outputFormat));
+    loading.stop();
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

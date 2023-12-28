@@ -29,7 +29,11 @@ program
   //
   .command('fetch')
   .alias('f')
-  .option('--no-interactive', 'If option is not set, default option enable.')
+  .option(
+    '--no-interactive',
+    'If option is not set, default option enable. (default: no-interactive)',
+    false,
+  )
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .option('-c, --channel-name <channel name>', 'Enter channel name (default: all channels)')
   .option(

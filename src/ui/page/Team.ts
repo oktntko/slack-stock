@@ -1,4 +1,5 @@
 import { color } from '~/lib/color';
+import { $loading } from '~/lib/loading';
 import { filepath, output } from '~/middleware/output';
 import { TeamService } from '~/service/TeamService';
 import { InputText } from '~/ui//component/InputText';
@@ -23,7 +24,9 @@ async function add(argToken: string | undefined) {
       })();
 
   // Team を登録する
+  const loading = $loading.start();
   const team = await TeamService.upsertTeam(token);
+  loading.stop();
 
   // 各データを登録する
   await Menu.fetch({
@@ -40,7 +43,9 @@ async function add(argToken: string | undefined) {
 }
 
 async function view(options: { interactive: boolean; outputFormat?: 'console' | 'csv' | 'xlsx' }) {
+  const loading = $loading.start();
   const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
+  loading.stop();
 
   const outputFormat = options.outputFormat
     ? options.outputFormat
@@ -49,7 +54,9 @@ async function view(options: { interactive: boolean; outputFormat?: 'console' | 
       : 'xlsx';
 
   if (teamList.length > 0) {
+    const loading = $loading.start();
     await output(outputFormat, teamList, filepath('team', outputFormat));
+    loading.stop();
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

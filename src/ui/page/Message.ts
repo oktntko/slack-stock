@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import util from 'node:util';
 import { color } from '~/lib/color';
+import { $loading } from '~/lib/loading';
 import { filepath, output } from '~/middleware/output';
 import { ChannelService } from '~/service/ChannelService';
 import { MessageService } from '~/service/MessageService';
@@ -45,6 +46,7 @@ async function fetch(options: {
       ? await InputDate('Select period "to" date', dayjs())
       : dayjs();
 
+  const loading = $loading.start();
   for (const {
     team_id,
     team: { token },
@@ -52,6 +54,7 @@ async function fetch(options: {
   } of channelList) {
     await MessageService.fetchMessage(team_id, token, channel_id, from, to);
   }
+  loading.stop();
 
   console.log(Icon.done, 'Success!');
 }
@@ -84,6 +87,7 @@ async function view(options: {
       ? await InputDate('Select period "to" date', dayjs())
       : dayjs();
 
+  const loading = $loading.start();
   const messageList = await MessageService.listMessage(
     {
       channel_id: { in: channelList.map((x) => x.channel_id) },
@@ -94,6 +98,7 @@ async function view(options: {
     },
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
+  loading.stop();
 
   const outputFormat = options.outputFormat
     ? options.outputFormat
@@ -102,7 +107,9 @@ async function view(options: {
       : 'xlsx';
 
   if (messageList.length > 0) {
+    const loading = $loading.start();
     await output(outputFormat, messageList, filepath('message', outputFormat, from, to));
+    loading.stop();
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');
@@ -144,6 +151,7 @@ async function stopwatch(
   const startKeyword = argStartKeyword ? argStartKeyword : await InputText('Enter start keyword');
   const stopKeyword = argStopKeyword ? argStopKeyword : await InputText('Enter stop  keyword');
 
+  const loading = $loading.start();
   const messageList = await MessageService.listMessageByStopwatchKeyword({
     channelIdList: channelList.map((x) => x.channel_id),
     from,
@@ -151,6 +159,7 @@ async function stopwatch(
     startKeyword,
     stopKeyword,
   });
+  loading.stop();
 
   const outputFormat = options.outputFormat
     ? options.outputFormat
@@ -159,7 +168,9 @@ async function stopwatch(
       : 'xlsx';
 
   if (messageList.length > 0) {
+    const loading = $loading.start();
     await output(outputFormat, messageList, filepath('message', outputFormat, from, to));
+    loading.stop();
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

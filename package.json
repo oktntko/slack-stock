@@ -25,6 +25,7 @@
     "inquirer": "^9.2.12",
     "inquirer-autocomplete-standalone": "^0.8.1",
     "inquirer-date-prompt": "^3.0.0",
+    "loading-cli": "^1.1.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
