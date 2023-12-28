@@ -1,9 +1,8 @@
 import inquirer from 'inquirer';
-import { OutputFormatType } from '~/middleware/type';
 import { Icon } from '~/ui/element/Icon';
 
 export async function SelectOutputFormatType() {
-  const { list } = await inquirer.prompt<{ list: OutputFormatType }>([
+  const { list } = await inquirer.prompt<{ list: 'console' | 'csv' | 'xlsx' }>([
     {
       type: 'list',
       name: 'list',

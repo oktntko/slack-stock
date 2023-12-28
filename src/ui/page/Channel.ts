@@ -1,5 +1,4 @@
 import { filepath, output } from '~/middleware/output';
-import { OutputFormatType } from '~/middleware/type';
 import { ChannelService } from '~/service/ChannelService';
 import { TeamService } from '~/service/TeamService';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
@@ -29,7 +28,7 @@ async function fetch(options: { interactive: boolean; teamName?: string | undefi
 async function view(options: {
   interactive: boolean;
   teamName?: string | undefined;
-  output?: OutputFormatType;
+  outputFormat?: 'console' | 'csv' | 'xlsx';
 }) {
   const teamListAll = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
   const teamList = options.teamName
@@ -46,14 +45,14 @@ async function view(options: {
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
 
-  const outputFormatType = options.output
-    ? options.output
+  const outputFormat = options.outputFormat
+    ? options.outputFormat
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
 
   if (channelList.length > 0) {
-    await output(outputFormatType, channelList, filepath('channel', outputFormatType));
+    await output(outputFormat, channelList, filepath('channel', outputFormat));
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

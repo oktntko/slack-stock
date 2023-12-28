@@ -14,6 +14,7 @@ export const Hidden /*          */ = '\x1b[8m'; /* useful for passwords */
 
 // # Reset
 export const ResetAll /*        */ = '\x1b[0m';
+// ! not working
 export const ResetBold /*       */ = '\x1b[21m';
 export const ResetBright /*     */ = ResetBold;
 export const ResetDim /*        */ = '\x1b[22m';
@@ -65,13 +66,13 @@ export const BgWhite /*         */ = '\x1b[107m';
 ////////////////////////////////
 const reset /*           */ = (message: string) => `${ResetAll}${message}`;
 
-const bold /*            */ = (message: string) => `${Bold}${message}${ResetBold}`;
+const bold /*            */ = (message: string) => `${Bold}${message}${ResetAll}`;
 const bright /*          */ = bold;
-const dim /*             */ = (message: string) => `${Dim}${message}${ResetDim}`;
-const underlined /*      */ = (message: string) => `${Underlined}${message}${ResetUnderlined}`;
-const blink /*           */ = (message: string) => `${Blink}${message}${ResetBlink}`;
-const reverse /*         */ = (message: string) => `${Reverse}${message}${ResetReverse}`;
-const hidden /*          */ = (message: string) => `${Hidden}${message}${ResetHidden}`;
+const dim /*             */ = (message: string) => `${Dim}${message}${ResetAll}`;
+const underlined /*      */ = (message: string) => `${Underlined}${message}${ResetAll}`;
+const blink /*           */ = (message: string) => `${Blink}${message}${ResetAll}`;
+const reverse /*         */ = (message: string) => `${Reverse}${message}${ResetAll}`;
+const hidden /*          */ = (message: string) => `${Hidden}${message}${ResetAll}`;
 
 const fgDefault /*       */ = (message: string) => `${Default}${message}${Default}`;
 const black /*           */ = (message: string) => `${Black}${message}${Default}`;

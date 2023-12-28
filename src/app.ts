@@ -1,7 +1,6 @@
-import { Command } from '@commander-js/extra-typings';
+import { Command, Option } from '@commander-js/extra-typings';
 import commander from 'commander';
 import dayjs from 'dayjs';
-import { OUTPUT_OPTION } from '~/middleware/type';
 import { Channel } from '~/ui/page/Channel';
 import { Menu } from '~/ui/page/Menu';
 import { Message } from '~/ui/page/Message';
@@ -9,6 +8,11 @@ import { Team } from '~/ui/page/Team';
 import { User } from '~/ui/page/User';
 
 export const program = new Command();
+
+const optionOutputFormat = new Option(
+  '-o, --output-format <output format>',
+  'Select output format. console, csv, xlsx (default: xlsx)',
+).choices(['console', 'csv', 'xlsx'] as const);
 
 program
   .name('slack-stock')
@@ -50,7 +54,7 @@ team.command('add').argument('[token]', 'OAuth token installed your workspace').
 team
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
-  .addOption(OUTPUT_OPTION)
+  .addOption(optionOutputFormat)
   .action(Team.view);
 
 ////////////////////////////////
@@ -68,7 +72,7 @@ user
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
-  .addOption(OUTPUT_OPTION)
+  .addOption(optionOutputFormat)
   .action(User.view);
 
 ////////////////////////////////
@@ -86,7 +90,7 @@ channel
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
-  .addOption(OUTPUT_OPTION)
+  .addOption(optionOutputFormat)
   .action(Channel.view);
 
 ////////////////////////////////
@@ -124,7 +128,7 @@ message
     'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
     validateAndParseDate,
   )
-  .addOption(OUTPUT_OPTION)
+  .addOption(optionOutputFormat)
   .action(Message.view);
 
 message
@@ -143,7 +147,7 @@ message
     'Enter period to. e.g. --to="YYYY-MM-DD". (default: today)',
     validateAndParseDate,
   )
-  .addOption(OUTPUT_OPTION)
+  .addOption(optionOutputFormat)
   .action(Message.stopwatch);
 
 message.command('search').action(Message.search);

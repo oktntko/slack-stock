@@ -1,10 +1,10 @@
 import { color } from '~/lib/color';
 import { filepath, output } from '~/middleware/output';
-import { OutputFormatType } from '~/middleware/type';
 import { TeamService } from '~/service/TeamService';
 import { InputText } from '~/ui//component/InputText';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
 import { Icon } from '~/ui/element/Icon';
+import { Menu } from '~/ui/page/Menu';
 
 export const Team = {
   add,
@@ -26,8 +26,10 @@ async function add(argToken: string | undefined) {
   const team = await TeamService.upsertTeam(token);
 
   // 各データを登録する
-  // TODO
-  // await COMMANDS.data.fetch(team);
+  await Menu.fetch({
+    interactive: false,
+    teamName: team.team_name,
+  });
 
   console.log(
     Icon.done,
@@ -37,17 +39,17 @@ async function add(argToken: string | undefined) {
   );
 }
 
-async function view(options: { interactive: boolean; output?: OutputFormatType }) {
+async function view(options: { interactive: boolean; outputFormat?: 'console' | 'csv' | 'xlsx' }) {
   const teamList = await TeamService.listTeam({}, [{ team_id: 'asc' }]);
 
-  const outputFormatType = options.output
-    ? options.output
+  const outputFormat = options.outputFormat
+    ? options.outputFormat
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
 
   if (teamList.length > 0) {
-    await output(outputFormatType, teamList, filepath('team', outputFormatType));
+    await output(outputFormat, teamList, filepath('team', outputFormat));
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

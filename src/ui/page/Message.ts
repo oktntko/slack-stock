@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import util from 'node:util';
 import { color } from '~/lib/color';
 import { filepath, output } from '~/middleware/output';
-import { OutputFormatType } from '~/middleware/type';
 import { ChannelService } from '~/service/ChannelService';
 import { MessageService } from '~/service/MessageService';
 import { Icon } from '~/ui//element/Icon';
@@ -62,7 +61,7 @@ async function view(options: {
   channelName?: string | undefined;
   from?: dayjs.Dayjs | undefined;
   to?: dayjs.Dayjs | undefined;
-  output?: OutputFormatType;
+  outputFormat?: 'console' | 'csv' | 'xlsx';
 }) {
   const channelListAll = await ChannelService.listChannel({ is_archived: 0 }, [
     { team_id: 'asc' },
@@ -96,14 +95,14 @@ async function view(options: {
     [{ team_id: 'asc' }, { channel_id: 'asc' }],
   );
 
-  const outputFormatType = options.output
-    ? options.output
+  const outputFormat = options.outputFormat
+    ? options.outputFormat
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
 
   if (messageList.length > 0) {
-    await output(outputFormatType, messageList, filepath('message', outputFormatType, from, to));
+    await output(outputFormat, messageList, filepath('message', outputFormat, from, to));
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');
@@ -118,7 +117,7 @@ async function stopwatch(
     channelName?: string | undefined;
     from?: dayjs.Dayjs | undefined;
     to?: dayjs.Dayjs | undefined;
-    output?: OutputFormatType;
+    outputFormat?: 'console' | 'csv' | 'xlsx';
   },
 ) {
   const channelListAll = await ChannelService.listChannel({ is_archived: 0 }, [
@@ -153,14 +152,14 @@ async function stopwatch(
     stopKeyword,
   });
 
-  const outputFormatType = options.output
-    ? options.output
+  const outputFormat = options.outputFormat
+    ? options.outputFormat
     : options.interactive
       ? await SelectOutputFormatType()
       : 'xlsx';
 
   if (messageList.length > 0) {
-    await output(outputFormatType, messageList, filepath('message', outputFormatType, from, to));
+    await output(outputFormat, messageList, filepath('message', outputFormat, from, to));
     console.log(Icon.success, 'Success!');
   } else {
     console.log(Icon.error, 'No data.');

@@ -1,11 +1,11 @@
 import { type Dayjs } from 'dayjs';
-import inquirer from 'inquirer';
 import { color } from '~/lib/color';
 import { Confirm } from '~/ui/component/Confirm';
-import { Icon } from '~/ui/element/Icon';
+import { SelectAction } from '~/ui/component/SelectAction';
 import { Channel } from '~/ui/page/Channel';
 import { Message } from '~/ui/page/Message';
 import { User } from '~/ui/page/User';
+import { Team } from './Team';
 
 export const Menu = {
   open,
@@ -14,31 +14,40 @@ export const Menu = {
 
 async function open() {
   for (;;) {
-    const action = await selectAction();
+    const action = await SelectAction();
     switch (action) {
-      case 'teams-add':
-        // await COMMANDS.teams.add(options);
+      case 'message-fetch':
+        await Message.fetch({ interactive: true });
         break;
-      case 'teams-view':
-        // await COMMANDS.teams.view(options);
+      case 'message-view':
+        await Message.view({ interactive: true });
+        break;
+      case 'message-search':
+        await Message.search();
+        break;
+      case 'message-stopwatch':
+        await Message.stopwatch('', '', { interactive: true });
         break;
       case 'data-fetch':
-        // await COMMANDS.data.fetch(options);
+        await fetch({ interactive: true });
         break;
-      case 'data-view':
-        // await COMMANDS.data.view(options);
+      case 'team-add':
+        await Team.add('');
         break;
-      case 'messages-stock':
-        // await COMMANDS.messages.stock(options);
+      case 'team-view':
+        await Team.view({ interactive: true });
         break;
-      case 'messages-view':
-        // await COMMANDS.messages.view(options);
+      case 'user-fetch':
+        await User.fetch({ interactive: true });
         break;
-      case 'messages-search':
-        // await COMMANDS.messages.search();
+      case 'user-view':
+        await User.view({ interactive: true });
         break;
-      case 'messages-timer':
-        // await COMMANDS.messages.timer(options);
+      case 'channel-fetch':
+        await Channel.fetch({ interactive: true });
+        break;
+      case 'channel-view':
+        await Channel.view({ interactive: true });
         break;
     }
 
@@ -47,63 +56,6 @@ async function open() {
       break;
     }
   }
-}
-
-// TODO コンポーネントに移動する
-async function selectAction() {
-  const ACTION_LIST = [
-    // new inquirer.Separator('== 💬 Messages ========================='),
-    {
-      name: '📥 Message stock',
-      value: 'messages-stock',
-    },
-    {
-      name: '📁 Message view',
-      value: 'messages-view',
-    },
-    {
-      name: '🔍 Message search',
-      value: 'messages-search',
-    },
-    {
-      name: '⏰ Message timer',
-      value: 'messages-timer',
-    },
-    // new inquirer.Separator('== 💽 Data (👤 Users & 📺 Channels) ===='),
-    {
-      name: '🔄 Data fetch',
-      value: 'data-fetch',
-    },
-    {
-      name: '📁 Data view',
-      value: 'data-view',
-    },
-    // new inquirer.Separator('== 👪 Teams ============================'),
-    {
-      name: '➕ Team add',
-      value: 'teams-add',
-    },
-    {
-      name: '📁 Team view',
-      value: 'teams-view',
-    },
-  ] as const;
-
-  // TODO inquirer.Separator type
-  const { selection } = await inquirer.prompt<{
-    selection: (typeof ACTION_LIST)[number]['value'];
-  }>([
-    {
-      type: 'list',
-      name: 'selection',
-      prefix: Icon.question,
-      message: 'What do you want to do?',
-      choices: ACTION_LIST,
-      pageSize: ACTION_LIST.length,
-    },
-  ]);
-
-  return selection;
 }
 
 async function fetch(options: {
