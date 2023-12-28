@@ -23,13 +23,12 @@
     "commander": "^11.1.0",
     "dayjs": "^1.11.10",
     "inquirer": "^9.2.12",
-    "inquirer-autocomplete-prompt": "^3.0.1",
+    "inquirer-autocomplete-standalone": "^0.8.1",
     "inquirer-date-prompt": "^3.0.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/inquirer": "^9.0.7",
-    "@types/inquirer-autocomplete-prompt": "^3.0.3",
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",

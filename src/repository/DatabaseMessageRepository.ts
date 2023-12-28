@@ -11,6 +11,7 @@ export const DatabaseMessageRepository = {
   vCreateMessage,
   vUpdateMessage,
   vFindManyMessageByStopwatchKeyword,
+  vFindManyMessageByFulltext,
 };
 
 async function findManyMessage(
@@ -112,6 +113,189 @@ async function vUpdateMessage(client_msg_id: string, text: string) {
       client_msg_id = ${client_msg_id}`;
 }
 
+type MessageStopwatch = {
+  team_id: string;
+  team_name: string;
+  channel_id: string;
+  channel_name: string;
+  user_id: string;
+  user_name: string;
+  date_tz: string;
+  start_time_tz: string | null;
+  stop_time_tz: string | null;
+  start_text: string | null;
+  stop_text: string | null;
+};
+async function vFindManyMessageByStopwatchKeyword(where: {
+  channelIdList: string[];
+  from: Dayjs;
+  to: Dayjs;
+  startKeyword: string;
+  stopKeyword: string;
+}) {
+  return prisma.$queryRaw<MessageStopwatch[]>`
+    SELECT
+        BASE.team_id
+      , teams.team_name
+      , BASE.channel_id
+      , channels.channel_name
+      , BASE.user_id
+      , users.user_name
+      , BASE.date_tz
+      , START_KEYWORD.time_tz AS start_time_tz
+      , STOP_KEYWORD.time_tz AS stop_time_tz
+      , START_KEYWORD.text AS start_text
+      , STOP_KEYWORD.text AS stop_text
+    FROM
+      (
+        SELECT
+            messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+        FROM
+          messages
+        WHERE
+          1 = 1
+          AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
+          AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
+        GROUP BY
+          messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+      ) AS BASE
+      LEFT OUTER JOIN (
+        SELECT
+            rank
+          , messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+          , messages.time_tz
+          , messages.text
+        FROM
+          v_messages
+          INNER JOIN messages
+            ON v_messages.client_msg_id = messages.client_msg_id
+        WHERE
+          1 = 1
+          AND v_messages.text MATCH ${where.startKeyword}
+          AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
+          AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
+        GROUP BY
+            messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+        ORDER BY
+          rank ASC
+      ) AS START_KEYWORD
+        ON  BASE.team_id     = START_KEYWORD.team_id
+        AND BASE.channel_id  = START_KEYWORD.channel_id
+        AND BASE.user_id     = START_KEYWORD.user_id
+        AND BASE.date_tz     = START_KEYWORD.date_tz
+      LEFT OUTER JOIN (
+        SELECT
+            rank
+          , messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+          , messages.time_tz
+          , messages.text
+        FROM
+          v_messages
+          INNER JOIN messages
+            ON v_messages.client_msg_id = messages.client_msg_id
+        WHERE
+          1 = 1
+          AND v_messages.text MATCH ${where.stopKeyword}
+          AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
+          AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
+        GROUP BY
+            messages.team_id
+          , messages.channel_id
+          , messages.user_id
+          , messages.date_tz
+        ORDER BY
+          rank ASC
+      ) AS STOP_KEYWORD
+        ON  BASE.team_id     = STOP_KEYWORD.team_id
+        AND BASE.channel_id  = STOP_KEYWORD.channel_id
+        AND BASE.user_id     = STOP_KEYWORD.user_id
+        AND BASE.date_tz     = STOP_KEYWORD.date_tz
+      LEFT OUTER JOIN teams
+        ON BASE.team_id = teams.team_id
+      LEFT OUTER JOIN channels
+        ON BASE.channel_id = channels.channel_id
+      LEFT OUTER JOIN users
+        ON BASE.user_id = users.user_id
+    ORDER BY
+        teams.team_name ASC
+      , channels.channel_name ASC
+      , users.user_name ASC
+      , BASE.date_tz ASC`;
+}
+
+type MessageFulltext = {
+  team_id: string;
+  team_name: string;
+  channel_id: string;
+  channel_name: string;
+  user_id: string;
+  user_name: string;
+  client_msg_id: string;
+  ts: string;
+  date_tz: string;
+  time_tz: string;
+  type: string;
+  text: string;
+  thread_ts: string;
+};
+async function vFindManyMessageByFulltext(input: string | undefined) {
+  const fulltext = input
+    ? input
+        .split(/\s+/g)
+        .map((input) => bigram(input))
+        .join(' ')
+    : '';
+
+  if (!fulltext) return [];
+
+  return prisma.$queryRaw<MessageFulltext[]>`
+    SELECT
+        rank
+      , messages.team_id
+      , teams.team_name
+      , messages.channel_id
+      , channels.channel_name
+      , messages.user_id
+      , users.user_name
+      , messages.client_msg_id
+      , messages.ts
+      , messages.date_tz
+      , messages.time_tz
+      , messages.type
+      , messages.text
+      , messages.thread_ts
+    FROM
+      v_messages
+      INNER JOIN messages
+        ON v_messages.client_msg_id = messages.client_msg_id
+      LEFT OUTER JOIN teams
+        ON messages.team_id = teams.team_id
+      LEFT OUTER JOIN channels
+        ON messages.channel_id = channels.channel_id
+      LEFT OUTER JOIN users
+        ON messages.user_id = users.user_id
+    WHERE
+      v_messages.text MATCH ${fulltext}
+    ORDER BY
+      rank ASC
+      , ts DESC`;
+}
+
 function bigram(text?: string) {
   if (!text) {
     return '';
@@ -128,130 +312,4 @@ function bigram(text?: string) {
   }
 
   return grams.join(' ');
-}
-
-type MessageStopwatch = {
-  team_id: string;
-  team_name: string;
-  channel_id: string;
-  channel_name: string;
-  user_id: string;
-  user_name: string;
-  date_tz: string;
-  start_time_tz: string;
-  stop_time_tz: string;
-  start_text: string;
-  stop_text: string;
-};
-async function vFindManyMessageByStopwatchKeyword(where: {
-  channelIdList: string[];
-  from: Dayjs;
-  to: Dayjs;
-  startKeyword: string;
-  stopKeyword: string;
-}) {
-  return prisma.$queryRaw<MessageStopwatch[]>`
-      SELECT
-          BASE.team_id
-        , teams.team_name
-        , BASE.channel_id
-        , channels.channel_name
-        , BASE.user_id
-        , users.user_name
-        , BASE.date_tz
-        , START_KEYWORD.time_tz AS start_time_tz
-        , STOP_KEYWORD.time_tz AS stop_time_tz
-        , START_KEYWORD.text AS start_text
-        , STOP_KEYWORD.text AS stop_text
-      FROM
-        (
-          SELECT
-              messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-          FROM
-            messages
-          WHERE
-            1 = 1
-            AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
-            AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
-          GROUP BY
-            messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-        ) AS BASE
-        LEFT OUTER JOIN (
-          SELECT
-              rank
-            , messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-            , messages.time_tz
-            , messages.text
-          FROM
-            v_messages
-            INNER JOIN messages
-              ON v_messages.client_msg_id = messages.client_msg_id
-          WHERE
-            1 = 1
-            AND v_messages.text MATCH ${where.startKeyword}
-            AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
-            AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
-          GROUP BY
-              messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-          ORDER BY
-            rank ASC
-        ) AS START_KEYWORD
-          ON  BASE.team_id     = START_KEYWORD.team_id
-          AND BASE.channel_id  = START_KEYWORD.channel_id
-          AND BASE.user_id     = START_KEYWORD.user_id
-          AND BASE.date_tz     = START_KEYWORD.date_tz
-        LEFT OUTER JOIN (
-          SELECT
-              rank
-            , messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-            , messages.time_tz
-            , messages.text
-          FROM
-            v_messages
-            INNER JOIN messages
-              ON v_messages.client_msg_id = messages.client_msg_id
-          WHERE
-            1 = 1
-            AND v_messages.text MATCH ${where.stopKeyword}
-            AND messages.channel_id IN (${Prisma.join(where.channelIdList)})
-            AND messages.ts BETWEEN ${String(where.from.unix())} AND ${String(where.to.unix())}
-          GROUP BY
-              messages.team_id
-            , messages.channel_id
-            , messages.user_id
-            , messages.date_tz
-          ORDER BY
-            rank ASC
-        ) AS STOP_KEYWORD
-          ON  BASE.team_id     = STOP_KEYWORD.team_id
-          AND BASE.channel_id  = STOP_KEYWORD.channel_id
-          AND BASE.user_id     = STOP_KEYWORD.user_id
-          AND BASE.date_tz     = STOP_KEYWORD.date_tz
-        LEFT OUTER JOIN teams
-          ON BASE.team_id = teams.team_id
-        LEFT OUTER JOIN channels
-          ON BASE.channel_id = channels.channel_id
-        LEFT OUTER JOIN users
-          ON BASE.user_id = users.user_id
-      ORDER BY
-          teams.team_name ASC
-        , channels.channel_name ASC
-        , users.user_name ASC
-        , BASE.date_tz ASC
-      `;
 }

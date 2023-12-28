@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import util from 'node:util';
+import { color } from '~/lib/color';
 import { filepath, output } from '~/middleware/output';
 import { OutputFormatType } from '~/middleware/type';
 import { ChannelService } from '~/service/ChannelService';
@@ -7,12 +9,14 @@ import { Icon } from '~/ui//element/Icon';
 import { InputDate } from '~/ui/component/InputDate';
 import { SelectChannelList } from '~/ui/component/SelectChannelList';
 import { SelectOutputFormatType } from '~/ui/component/SelectOutputFormatType';
+import { Autocomplete } from '../component/Autocomplete';
 import { InputText } from '../component/InputText';
 
 export const Message = {
   fetch,
   view,
   stopwatch,
+  search,
 };
 
 async function fetch(options: {
@@ -161,4 +165,26 @@ async function stopwatch(
   } else {
     console.log(Icon.error, 'No data.');
   }
+}
+
+async function search() {
+  const answer = await Autocomplete({
+    message: 'find',
+    source: async (input) => {
+      const messageList = await MessageService.searchMessage(input);
+      return messageList.map((message) => {
+        const name = `${message.time_tz} | ${message.team_name} | ${message.channel_name} | ${
+          message.user_name
+        } | ${color.bold(message.text.replaceAll('\n', color.dim('↓ ')))}`;
+
+        return {
+          name,
+          value: message,
+        };
+      });
+    },
+    pageSize: 20,
+  });
+
+  console.log(util.inspect(answer, { showHidden: false, depth: null, colors: true }));
 }

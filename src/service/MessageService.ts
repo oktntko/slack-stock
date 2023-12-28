@@ -7,6 +7,7 @@ export const MessageService = {
   fetchMessage,
   listMessage,
   listMessageByStopwatchKeyword,
+  searchMessage,
 };
 
 async function fetchMessage(
@@ -58,4 +59,8 @@ async function listMessageByStopwatchKeyword(where: {
   stopKeyword: string;
 }) {
   return DatabaseMessageRepository.vFindManyMessageByStopwatchKeyword(where);
+}
+
+async function searchMessage(input: string | undefined) {
+  return DatabaseMessageRepository.vFindManyMessageByFulltext(input);
 }

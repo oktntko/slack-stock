@@ -44,7 +44,9 @@ program
 // team
 ////////////////////////////////
 const team = program.command('team');
+
 team.command('add').argument('[token]', 'OAuth token installed your workspace').action(Team.add);
+
 team
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
@@ -55,11 +57,13 @@ team
 // user
 ////////////////////////////////
 const user = program.command('user');
+
 user
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .action(User.fetch);
+
 user
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
@@ -71,11 +75,13 @@ user
 // channel
 ////////////////////////////////
 const channel = program.command('channel');
+
 channel
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
   .option('-t, --team-name <team name>', 'Enter team name (default: all teams)')
   .action(Channel.fetch);
+
 channel
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
@@ -87,6 +93,7 @@ channel
 // message
 ////////////////////////////////
 const message = program.command('message');
+
 message
   .command('fetch')
   .option('--no-interactive', 'If option is not set, default option enable.')
@@ -102,6 +109,7 @@ message
     validateAndParseDate,
   )
   .action(Message.fetch);
+
 message
   .command('view')
   .option('--no-interactive', 'If option is not set, default option enable.')
@@ -118,6 +126,7 @@ message
   )
   .addOption(OUTPUT_OPTION)
   .action(Message.view);
+
 message
   .command('stopwatch')
   .argument('[start keyword]', 'Enter start keyword. ex) --start-keyword="start".')
@@ -136,6 +145,8 @@ message
   )
   .addOption(OUTPUT_OPTION)
   .action(Message.stopwatch);
+
+message.command('search').action(Message.search);
 
 function validateAndParseDate(value: string) {
   const day = dayjs(value, 'YYYY-MM-DD', true);
