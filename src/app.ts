@@ -17,7 +17,7 @@ program
   .name('slack-stock')
   .description('CLI to stock Slack data in your DB (SQLite).')
   .alias('slst')
-  .version('0.2.4');
+  .version('0.2.5');
 
 ////////////////////////////////
 // menu

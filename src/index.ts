@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import '~/lib/dayjs';
 import '~/lib/inquirer';
 import '~/middleware/password';
