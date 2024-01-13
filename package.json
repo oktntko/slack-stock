@@ -7,7 +7,8 @@
     "slst": "dist/index.js"
   },
   "files": [
-    "/bin"
+    "/bin",
+    "/*.so.node"
   ],
   "author": "oktntko@gmail.com",
   "repository": {
@@ -24,7 +25,7 @@
   "scripts": {
     "start": "node --require esbuild-register src/index.ts",
     "build": "npm-run-all --parallel type-check build-only",
-    "build-only": "esbuild src/index.ts --bundle --define:process.env.SLACK_STOCK_PUBLISH=true --minify --outfile=dist/index.js --platform=node",
+    "build-only": "esbuild src/index.ts --bundle --define:process.env.SLACK_STOCK_PUBLISH=true --minify --outfile=dist/index.js --platform=node && cp node_modules/prisma/*.so.node ./",
     "type-check": "tsc --project tsconfig.type.json && tsc-alias -p tsconfig.type.json ",
     "lint": "eslint --ext .js,.ts src",
     "format": "prettier src --write",
