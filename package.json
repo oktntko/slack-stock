@@ -1,6 +1,6 @@
 {
   "name": "slack-stock",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "This app can stock Slack data in your DB (SQLite) with some setup. And you can view the data in various supported formats (Excel, Csv, Tsv, Console).",
   "license": "MIT",
   "bin": {
@@ -35,7 +35,7 @@
     "prisma:seed": "node --require esbuild-register prisma/seed.ts",
     "prepublishOnly": "pnpm pkg fix && pnpm prisma:generate && pnpm type-check && pnpm build-only"
   },
-  "dependencies": {
+  "devDependencies": {
     "@commander-js/extra-typings": "^11.1.0",
     "@prisma/client": "^5.7.1",
     "@slack/web-api": "^6.11.0",
@@ -45,9 +45,7 @@
     "inquirer-autocomplete-standalone": "^0.8.1",
     "inquirer-date-prompt": "^3.0.0",
     "loading-cli": "^1.1.2",
-    "xlsx": "^0.18.5"
-  },
-  "devDependencies": {
+    "xlsx": "^0.18.5",
     "@types/inquirer": "^9.0.7",
     "@types/node": "^20.10.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",

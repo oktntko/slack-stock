@@ -1,5 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { MessageElement } from '@slack/web-api/dist/response/ConversationsHistoryResponse';
+import { randomUUID } from 'crypto';
 import dayjs, { type Dayjs } from 'dayjs';
 import { prisma } from '~/middleware/prisma';
 
@@ -43,33 +44,36 @@ async function findUniqueMessage(where: Prisma.MessageWhereUniqueInput) {
 }
 
 async function upsertMessage(message: MessageElement & { team_id: string; channel_id: string }) {
+  const client_msg_id = message.client_msg_id ?? randomUUID();
+  const ts = message.ts ? dayjs.unix(Number(message.ts)) : undefined;
+
   const result = await prisma.message.upsert({
     create: {
-      client_msg_id: message.client_msg_id!,
+      client_msg_id,
       team_id: message.team_id,
       channel_id: message.channel_id,
-      user_id: message.user!,
-      ts: message.ts!,
-      date_tz: dayjs.unix(Number(message.ts!)).format('YYYY-MM-DD'),
-      time_tz: dayjs.unix(Number(message.ts!)).format('YYYY-MM-DD HH:mm:ss'),
-      type: message.type!,
-      text: message.text!,
+      user_id: message.user,
+      ts: message.ts,
+      date_tz: ts ? ts.format('YYYY-MM-DD') : undefined,
+      time_tz: ts ? ts.format('YYYY-MM-DD HH:mm:ss') : undefined,
+      type: message.type,
+      text: message.text,
       thread_ts: message.thread_ts,
     },
     update: {
-      client_msg_id: message.client_msg_id!,
+      client_msg_id,
       team_id: message.team_id,
       channel_id: message.channel_id,
-      user_id: message.user!,
-      ts: message.ts!,
-      date_tz: dayjs.unix(Number(message.ts!)).format('YYYY-MM-DD'),
-      time_tz: dayjs.unix(Number(message.ts!)).format('YYYY-MM-DD HH:mm:ss'),
-      type: message.type!,
-      text: message.text!,
+      user_id: message.user,
+      ts: message.ts,
+      date_tz: ts ? ts.format('YYYY-MM-DD') : undefined,
+      time_tz: ts ? ts.format('YYYY-MM-DD HH:mm:ss') : undefined,
+      type: message.type,
+      text: message.text,
       thread_ts: message.thread_ts,
     },
     where: {
-      client_msg_id: message.client_msg_id!,
+      client_msg_id,
     },
   });
 

@@ -132,16 +132,16 @@ export async function createTableIfNotExists() {
         "client_msg_id" TEXT NOT NULL PRIMARY KEY,
         "team_id" TEXT NOT NULL,
         "channel_id" TEXT NOT NULL,
-        "user_id" TEXT NOT NULL,
-        "ts" TEXT NOT NULL,
-        "date_tz" TEXT NOT NULL,
-        "time_tz" TEXT NOT NULL,
-        "type" TEXT NOT NULL,
-        "text" TEXT NOT NULL,
+        "user_id" TEXT,
+        "ts" TEXT NOT NULL DEFAULT '',
+        "date_tz" TEXT NOT NULL DEFAULT '',
+        "time_tz" TEXT NOT NULL DEFAULT '',
+        "type" TEXT NOT NULL DEFAULT '',
+        "text" TEXT NOT NULL DEFAULT '',
         "thread_ts" TEXT NOT NULL DEFAULT '',
         CONSTRAINT "messages_team_id_fkey" FOREIGN KEY ("team_id") REFERENCES "teams" ("team_id") ON DELETE RESTRICT ON UPDATE CASCADE,
         CONSTRAINT "messages_channel_id_fkey" FOREIGN KEY ("channel_id") REFERENCES "channels" ("channel_id") ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT "messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE RESTRICT ON UPDATE CASCADE
+        CONSTRAINT "messages_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users" ("user_id") ON DELETE SET NULL ON UPDATE CASCADE
     )`;
 
   await prisma.$executeRaw`

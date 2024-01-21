@@ -79,14 +79,14 @@ model Message {
   team       Team    @relation(fields: [team_id], references: [team_id])
   channel_id String
   channel    Channel @relation(fields: [channel_id], references: [channel_id])
-  user_id    String
-  user       User    @relation(fields: [user_id], references: [user_id])
+  user_id    String?
+  user       User?   @relation(fields: [user_id], references: [user_id])
 
-  ts        String
-  date_tz   String
-  time_tz   String
-  type      String
-  text      String
+  ts        String @default("")
+  date_tz   String @default("")
+  time_tz   String @default("")
+  type      String @default("")
+  text      String @default("")
   thread_ts String @default("")
 
   @@map("messages")
